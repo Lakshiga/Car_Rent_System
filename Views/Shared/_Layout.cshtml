@@ -1,0 +1,876 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CYNEX BLAZER Car Rental</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cynex-black: #000000;
+            --cynex-silver: #C0C0C0;
+            --cynex-red: #FF0000;
+            --cynex-dark-silver: #808080;
+            --cynex-light-silver: #E8E8E8;
+            --cynex-gradient: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            --cynex-red-gradient: linear-gradient(45deg, #FF0000, #FF4444);
+            --cynex-silver-gradient: linear-gradient(45deg, #C0C0C0, #E8E8E8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--cynex-black);
+            color: var(--cynex-silver);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle at 20% 80%, rgba(255, 0, 0, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(192, 192, 192, 0.1) 0%, transparent 50%), var(--cynex-black);
+                z-index: -1;
+            }
+
+        .cynex-font {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .text-cynex-silver {
+            color: var(--cynex-silver) !important;
+        }
+
+        .text-cynex-red {
+            color: var(--cynex-red) !important;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--cynex-red);
+            box-shadow: 0 4px 20px rgba(255, 0, 0, 0.3);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+            .navbar.scrolled {
+                background: rgba(0, 0, 0, 0.98) !important;
+                box-shadow: 0 4px 30px rgba(255, 0, 0, 0.5);
+            }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--cynex-silver) !important;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+            .navbar-brand:hover {
+                color: var(--cynex-red) !important;
+                transform: scale(1.05);
+            }
+
+            .navbar-brand img {
+                height: 50px;
+                width: auto;
+                margin-right: 15px;
+                filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5));
+                transition: all 0.3s ease;
+            }
+
+            .navbar-brand:hover img {
+                filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.8));
+                transform: rotate(5deg);
+            }
+
+        .navbar .nav-link {
+            color: var(--cynex-silver) !important;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 0 10px;
+            padding: 10px 20px !important;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .navbar .nav-link::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: var(--cynex-red-gradient);
+                transition: all 0.3s ease;
+                z-index: -1;
+            }
+
+            .navbar .nav-link:hover {
+                color: white !important;
+                transform: translateY(-2px);
+            }
+
+                .navbar .nav-link:hover::before {
+                    left: 0;
+                }
+
+        .btn-cynex-primary {
+            background: var(--cynex-red-gradient);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .btn-cynex-primary::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(45deg, #FF4444, #FF0000);
+                transition: all 0.3s ease;
+                z-index: -1;
+            }
+
+            .btn-cynex-primary:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
+                color: white;
+            }
+
+                .btn-cynex-primary:hover::before {
+                    left: 0;
+                }
+
+        .btn-cynex-secondary {
+            background: transparent;
+            border: 2px solid var(--cynex-silver);
+            color: var(--cynex-silver);
+            font-weight: 600;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .btn-cynex-secondary::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: var(--cynex-silver-gradient);
+                transition: all 0.3s ease;
+                z-index: -1;
+            }
+
+            .btn-cynex-secondary:hover {
+                color: var(--cynex-black);
+                border-color: var(--cynex-silver);
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(192, 192, 192, 0.3);
+            }
+
+                .btn-cynex-secondary:hover::before {
+                    left: 0;
+                }
+
+        .cynex-card {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .cynex-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: var(--cynex-red-gradient);
+                transform: scaleX(0);
+                transition: transform 0.3s ease;
+            }
+
+            .cynex-card:hover {
+                transform: translateY(-10px);
+                border-color: var(--cynex-red);
+                box-shadow: 0 20px 40px rgba(255, 0, 0, 0.2);
+            }
+
+                .cynex-card:hover::before {
+                    transform: scaleX(1);
+                }
+
+        .hero-section {
+            background: var(--cynex-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 4rem;
+            background: var(--cynex-silver-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 0 20px rgba(192, 192, 192, 0.6));
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--cynex-silver);
+            text-align: center;
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .stats-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--cynex-red);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+            .stats-card::after {
+                content: '';
+                position: absolute;
+                inset: 2px;
+                background: var(--cynex-black);
+                border-radius: 18px;
+                z-index: -1;
+            }
+
+            .stats-card:hover {
+                transform: scale(1.05);
+                box-shadow: 0 10px 30px rgba(255, 0, 0, 0.4);
+            }
+
+        .stats-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--cynex-red);
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-label {
+            color: var(--cynex-silver);
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .car-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+            .car-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--cynex-red-gradient);
+                transform: scaleX(0);
+                transition: transform 0.3s ease;
+            }
+
+            .car-card:hover {
+                transform: translateY(-15px);
+                box-shadow: 0 25px 50px rgba(255, 0, 0, 0.3);
+                border-color: var(--cynex-red);
+            }
+
+                .car-card:hover::before {
+                    transform: scaleX(1);
+                }
+
+        .car-image {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .car-card:hover .car-image {
+            transform: scale(1.1);
+        }
+
+        .price-tag {
+            background: var(--cynex-red-gradient);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .form-control {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(192, 192, 192, 0.3);
+            border-radius: 10px;
+            color: var(--cynex-silver);
+            padding: 15px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+            .form-control:focus {
+                background: rgba(0, 0, 0, 0.9);
+                border-color: var(--cynex-red);
+                box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+                color: white;
+            }
+
+            .form-control::placeholder {
+                color: rgba(192, 192, 192, 0.6);
+            }
+
+        .form-label {
+            color: var(--cynex-silver);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .table {
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--cynex-silver);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+            .table th {
+                background: var(--cynex-red);
+                color: white;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                border: none;
+                padding: 20px;
+            }
+
+            .table td {
+                border-color: rgba(192, 192, 192, 0.1);
+                padding: 15px 20px;
+                vertical-align: middle;
+            }
+
+            .table tbody tr:hover {
+                background: rgba(255, 0, 0, 0.1);
+            }
+
+        .badge {
+            font-size: 0.9rem;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+            .badge.bg-success {
+                background: linear-gradient(45deg, #00FF00, #00CC00) !important;
+            }
+
+            .badge.bg-danger {
+                background: var(--cynex-red-gradient) !important;
+            }
+
+        .alert {
+            border: none;
+            border-radius: 15px;
+            padding: 20px;
+            font-weight: 500;
+            border-left: 5px solid;
+        }
+
+        .alert-success {
+            background: rgba(0, 255, 0, 0.1);
+            color: #00FF00;
+            border-left-color: #00FF00;
+        }
+
+        .alert-danger {
+            background: rgba(255, 0, 0, 0.1);
+            color: var(--cynex-red);
+            border-left-color: var(--cynex-red);
+        }
+
+        .footer {
+            background: var(--cynex-black);
+            border-top: 3px solid var(--cynex-red);
+            color: var(--cynex-silver);
+            padding: 4rem 0 2rem;
+            margin-top: 5rem;
+        }
+
+            .footer h5 {
+                color: var(--cynex-red);
+                font-family: 'Orbitron', monospace;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                margin-bottom: 1.5rem;
+            }
+
+            .footer a {
+                color: var(--cynex-silver);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+                .footer a:hover {
+                    color: var(--cynex-red);
+                    transform: translateX(5px);
+                }
+
+        .animate-fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+            .animate-fade-in.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        .animate-slide-in {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s ease;
+        }
+
+            .animate-slide-in.visible {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--cynex-red);
+        }
+
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--cynex-black);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--cynex-red-gradient);
+            border-radius: 6px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: linear-gradient(45deg, #FF4444, #FF6666);
+            }
+
+        /* Mobile Responsive Styles */
+        .hero-title-mobile {
+            font-size: 2.5rem;
+        }
+
+        .hero-subtitle-mobile {
+            font-size: 1.2rem;
+        }
+
+        .navbar-brand-mobile {
+            font-size: 1.2rem;
+        }
+
+            .navbar-brand-mobile img {
+                height: 40px;
+            }
+
+        .stats-number-mobile {
+            font-size: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNavbar">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/1001491317.jpg" alt="CYNEX BLAZER Logo">
+                    <span class="cynex-font">CYNEX BLAZER</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Customer" asp-action="BrowseCars">
+                                <i class="fas fa-car"></i> Fleet
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="About">
+                                <i class="fas fa-info-circle"></i> About
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Contact">
+                                <i class="fas fa-phone"></i> Contact
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (Context.Session.GetString("Username") != null)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-circle"></i> @Context.Session.GetString("FullName")
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-dark">
+                                    @if (Context.Session.GetString("Role") == "Admin")
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard">
+                                                <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                                            </a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Customer" asp-action="Dashboard">
+                                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Customer" asp-action="BookingHistory">
+                                                <i class="fas fa-history"></i> My Bookings
+                                            </a>
+                                        </li>
+                                    }
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                            <i class="fas fa-user-edit"></i> Profile
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
+                                            <i class="fas fa-sign-out-alt"></i> Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">
+                                    <i class="fas fa-user-plus"></i> Register
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show animate-fade-in position-fixed" style="top: 100px; right: 20px; z-index: 9999; max-width: 400px;" role="alert">
+                <i class="fas fa-check-circle"></i> @TempData["Success"]
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show animate-fade-in position-fixed" style="top: 100px; right: 20px; z-index: 9999; max-width: 400px;" role="alert">
+                <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <img src="~/images/1001491317.jpg" alt="CYNEX BLAZER" style="height: 60px; margin-right: 15px;">
+                        <h5 class="cynex-font mb-0">CYNEX BLAZER</h5>
+                    </div>
+                    <p>Experience the ultimate in luxury car rentals. Where performance meets prestige, and every journey becomes an adventure.</p>
+                    <div class="social-links mt-3">
+                        <a href="#" class="me-3"><i class="fab fa-facebook-f fa-2x"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-instagram fa-2x"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-twitter fa-2x"></i></a>
+                        <a href="#"><i class="fab fa-youtube fa-2x"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Our Fleet</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Locations</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Services</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> About Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Services</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Luxury Car Rental</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Corporate Fleet</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Event Rentals</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Chauffeur Service</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact Info</h5>
+                    <p><i class="fas fa-phone text-cynex-red"></i> +1 (555) CYNEX-99</p>
+                    <p><i class="fas fa-envelope text-cynex-red"></i> info@cynexblazer.com</p>
+                    <p><i class="fas fa-map-marker-alt text-cynex-red"></i> 123 Luxury Drive, Elite City</p>
+                    <p><i class="fas fa-clock text-cynex-red"></i> 24/7 Premium Service</p>
+                </div>
+            </div>
+            <hr class="my-4" style="border-color: var(--cynex-red);">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2024 CYNEX BLAZER. All rights reserved. | Luxury Redefined.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-cynex-silver me-3">Privacy Policy</a>
+                    <a href="#" class="text-cynex-silver me-3">Terms of Service</a>
+                    <a href="#" class="text-cynex-silver">Support</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Navbar scroll effect
+        $(window).scroll(function() {
+            if ($(window).scrollTop() > 50) {
+                $('#mainNavbar').addClass('scrolled');
+            } else {
+                $('#mainNavbar').removeClass('scrolled');
+            }
+        });
+
+        // Auto-hide alerts
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+
+        // Form enhancements
+        $('form').on('submit', function() {
+            const submitBtn = $(this).find('button[type="submit"]');
+            const originalText = submitBtn.html();
+            submitBtn.prop('disabled', true).html('<span class="loading-spinner"></span> Processing...');
+
+            setTimeout(function() {
+                submitBtn.prop('disabled', false).html(originalText);
+            }, 3000);
+        });
+
+        // Smooth scrolling
+        $('a[href^="#"]').on('click', function(event) {
+            const target = $(this.getAttribute('href'));
+            if (target.length) {
+                event.preventDefault();
+                $('html, body').stop().animate({
+                    scrollTop: target.offset().top - 100
+                }, 1000);
+            }
+        });
+
+        // Animation on scroll
+        $(window).scroll(function() {
+            $('.animate-fade-in, .animate-slide-in').each(function() {
+                var elementTop = $(this).offset().top;
+                var elementBottom = elementTop + $(this).outerHeight();
+                var viewportTop = $(window).scrollTop();
+                var viewportBottom = viewportTop + $(window).height();
+
+                if (elementBottom > viewportTop && elementTop < viewportBottom) {
+                    $(this).addClass('visible');
+                }
+            });
+        });
+
+        // Date validation for booking forms
+        function validateBookingDates() {
+            const pickupDate = new Date($('#PickupDate').val());
+            const returnDate = new Date($('#ReturnDate').val());
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (pickupDate < today) {
+                showAlert('Pickup date cannot be in the past.', 'danger');
+                return false;
+            }
+
+            if (returnDate <= pickupDate) {
+                showAlert('Return date must be after pickup date.', 'danger');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Custom alert function
+        function showAlert(message, type) {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show animate-fade-in position-fixed"
+                     style="top: 100px; right: 20px; z-index: 9999; max-width: 400px;" role="alert">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            $('body').append(alertHtml);
+
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        }
+
+        // Calculate total cost dynamically
+        function calculateTotalCost() {
+            const pickupDate = new Date($('#PickupDate').val());
+            const returnDate = new Date($('#ReturnDate').val());
+            const dailyRate = parseFloat($('#DailyRate').val()) || 0;
+
+            if (pickupDate && returnDate && returnDate > pickupDate) {
+                const timeDiff = returnDate.getTime() - pickupDate.getTime();
+                const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+                const totalCost = daysDiff * dailyRate;
+
+                $('#TotalDays').text(daysDiff + ' day' + (daysDiff > 1 ? 's' : ''));
+                $('#TotalCost').text('$' + totalCost.toFixed(2));
+            }
+        }
+
+        // Attach event listeners for date inputs
+        $(document).on('change', '#PickupDate, #ReturnDate', calculateTotalCost);
+
+        // Enhanced form validation
+        $('input, select, textarea').on('blur', function() {
+            if ($(this).is(':invalid')) {
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid').addClass('is-valid');
+            }
+        });
+
+        // Mobile responsive handling
+        function handleMobileStyles() {
+            if (window.innerWidth <= 768) {
+                $('.hero-title').addClass('hero-title-mobile');
+                $('.hero-subtitle').addClass('hero-subtitle-mobile');
+                $('.navbar-brand').addClass('navbar-brand-mobile');
+                $('.stats-number').addClass('stats-number-mobile');
+            } else {
+                $('.hero-title').removeClass('hero-title-mobile');
+                $('.hero-subtitle').removeClass('hero-subtitle-mobile');
+                $('.navbar-brand').removeClass('navbar-brand-mobile');
+                $('.stats-number').removeClass('stats-number-mobile');
+            }
+        }
+
+        // Handle resize
+        $(window).resize(handleMobileStyles);
+        $(document).ready(handleMobileStyles);
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

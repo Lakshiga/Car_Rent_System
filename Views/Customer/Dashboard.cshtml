@@ -1,0 +1,228 @@
+﻿@model IEnumerable<Car_Rent_System.Models.Booking>
+
+@{
+    ViewData["Title"] = "Customer Dashboard";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-6 fw-bold">
+                        <i class="fas fa-tachometer-alt"></i> Welcome, @Context.Session.GetString("FullName")!
+                    </h1>
+                    <p class="text-muted">Manage your bookings and explore our car collection</p>
+                </div>
+                <div>
+                    <a asp-action="BrowseCars" class="btn btn-primary">
+                        <i class="fas fa-car"></i> Browse Cars
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-3 col-md-6">
+            <div class="dashboard-card">
+                <div class="d-flex align-items-center">
+                    <div class="dashboard-icon me-3">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0">@ViewBag.TotalBookings</h3>
+                        <p class="mb-0">Total Bookings</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="dashboard-card">
+                <div class="d-flex align-items-center">
+                    <div class="dashboard-icon me-3">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0">$@ViewBag.TotalSpent</h3>
+                        <p class="mb-0">Total Spent</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="dashboard-card">
+                <div class="d-flex align-items-center">
+                    <div class="dashboard-icon me-3">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0">4.8</h3>
+                        <p class="mb-0">Your Rating</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="dashboard-card">
+                <div class="d-flex align-items-center">
+                    <div class="dashboard-icon me-3">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0">Gold</h3>
+                        <p class="mb-0">Member Status</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-4">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-md-6">
+                            <a asp-action="BrowseCars" class="btn btn-outline-primary w-100 py-3">
+                                <i class="fas fa-search fa-2x mb-2 d-block"></i>
+                                Browse Cars
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <a asp-action="BookingHistory" class="btn btn-outline-success w-100 py-3">
+                                <i class="fas fa-history fa-2x mb-2 d-block"></i>
+                                My Bookings
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <a asp-controller="Account" asp-action="Profile" class="btn btn-outline-info w-100 py-3">
+                                <i class="fas fa-user-edit fa-2x mb-2 d-block"></i>
+                                Edit Profile
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <a href="#" class="btn btn-outline-warning w-100 py-3">
+                                <i class="fas fa-headset fa-2x mb-2 d-block"></i>
+                                Support
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-clock"></i> Recent Bookings
+                    </h5>
+                    <a asp-action="BookingHistory" class="btn btn-sm btn-outline-primary">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Car</th>
+                                        <th>Pickup Date</th>
+                                        <th>Return Date</th>
+                                        <th>Total Cost</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var booking in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="~/images/Lambogini.jpg" class="car-image" alt="BMW M5 Competition
+                                                         class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;" alt="Car">
+                                                    <div>
+                                                        <div class="fw-bold">@booking.Car.CarName</div>
+                                                        <small class="text-muted">@booking.Car.CarModel</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>@booking.PickupDate.ToString("MMM dd, yyyy")</td>
+                                            <td>@booking.ReturnDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="fw-bold">$@booking.TotalCost</td>
+                                            <td>
+                                                @if (booking.BookingStatus == "Confirmed")
+                                                {
+                                                    <span class="badge bg-success">@booking.BookingStatus</span>
+                                                }
+                                                else if (booking.BookingStatus == "Cancelled")
+                                                {
+                                                    <span class="badge bg-danger">@booking.BookingStatus</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-primary">@booking.BookingStatus</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (booking.BookingStatus == "Confirmed" && booking.PickupDate > DateTime.Today)
+                                                {
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="cancelBooking(@booking.BookingID)">
+                                                        <i class="fas fa-times"></i> Cancel
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No bookings yet</h5>
+                            <p class="text-muted">Start exploring our amazing car collection!</p>
+                            <a asp-action="BrowseCars" class="btn btn-primary">
+                                <i class="fas fa-car"></i> Browse Cars
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function cancelBooking(bookingId) {
+            if (confirm('Are you sure you want to cancel this booking?')) {
+                $.post('@Url.Action("CancelBooking", "Customer")', { id: bookingId })
+                    .done(function(data) {
+                        location.reload();
+                    })
+                    .fail(function() {
+                        alert('Error cancelling booking. Please try again.');
+                    });
+            }
+        }
+    </script>
+}

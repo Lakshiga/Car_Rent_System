@@ -1,0 +1,181 @@
+﻿@model IEnumerable<Car_Rent_System.Models.Car>
+
+@{
+    ViewData["Title"] = "Manage Fleet";
+}
+
+<div class="container-fluid" style="padding-top: 100px;">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="cynex-font text-cynex-silver display-5">
+                        <i class="fas fa-car text-cynex-red"></i> MANAGE FLEET
+                    </h1>
+                    <p class="text-muted">Oversee and manage your luxury vehicle collection</p>
+                </div>
+                <div>
+                    <a asp-action="AddCar" class="btn btn-cynex-primary">
+                        <i class="fas fa-plus"></i> ADD NEW CAR
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Fleet Grid -->
+    <div class="row g-4">
+        @if (Model.Any())
+        {
+            @foreach (var car in Model)
+            {
+                <div class="col-xl-4 col-lg-6 col-md-6">
+                    <div class="car-card cynex-card h-100">
+                        <div class="position-relative">
+                            <img src="@car.ImageUrl" class="car-image" alt="@car.CarName">
+                            <div class="position-absolute top-0 end-0 m-3">
+                                @if (car.IsAvailable)
+                                {
+                                    <span class="badge bg-success fs-6">Available</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger fs-6">Booked</span>
+                                }
+                            </div>
+                            <div class="position-absolute bottom-0 start-0 m-3">
+                                <span class="price-tag fs-5">$@car.DailyRate/day</span>
+                            </div>
+                        </div>
+
+                        <div class="card-body d-flex flex-column p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title cynex-font text-cynex-silver mb-0">@car.CarName</h5>
+                                <small class="text-cynex-red fw-bold">@car.CarModel</small>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-tag text-cynex-red"></i> @car.CarType
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-gas-pump text-cynex-red"></i> @car.FuelType
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-users text-cynex-red"></i> @car.SeatingCapacity Seats
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-cogs text-cynex-red"></i> @car.Transmission
+                                    </small>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(car.Description))
+                            {
+                                <p class="card-text flex-grow-1 text-muted small">@car.Description</p>
+                            }
+
+                            @if (car.Mileage.HasValue)
+                            {
+                                <div class="mb-3">
+                                    <small class="text-success">
+                                        <i class="fas fa-leaf text-cynex-red"></i> @car.Mileage km/l
+                                    </small>
+                                </div>
+                            }
+
+                            <div class="mt-auto">
+                                <div class="d-grid gap-2">
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="EditCar" asp-route-id="@car.CarID" class="btn btn-outline-warning">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <button class="btn btn-outline-danger" onclick="confirmDelete(@car.CarID, '@car.CarName')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                    <button class="btn btn-outline-info btn-sm" onclick="toggleAvailability(@car.CarID, @car.IsAvailable.ToString().ToLower())">
+                                        <i class="fas fa-@(car.IsAvailable ? "ban" : "check")"></i>
+                                        @(car.IsAvailable ? "Mark Unavailable" : "Mark Available")
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-car fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No vehicles in fleet</h4>
+                    <p class="text-muted">Start building your luxury fleet by adding premium vehicles</p>
+                    <a asp-action="AddCar" class="btn btn-cynex-primary">
+                        <i class="fas fa-plus"></i> Add First Car
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content cynex-card">
+            <div class="modal-header" style="border-bottom: 1px solid var(--cynex-red);">
+                <h5 class="modal-title cynex-font text-cynex-silver">
+                    <i class="fas fa-exclamation-triangle text-cynex-red"></i> Confirm Deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-cynex-silver">
+                <p>Are you sure you want to delete <strong id="carNameToDelete"></strong> from the fleet?</p>
+                <p class="text-warning small">
+                    <i class="fas fa-warning"></i> This action cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid rgba(192, 192, 192, 0.2);">
+                <button type="button" class="btn btn-cynex-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete Car
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(carId, carName) {
+            document.getElementById('carNameToDelete').textContent = carName;
+            document.getElementById('deleteForm').action = '@Url.Action("DeleteCar", "Admin")/' + carId;
+
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        }
+
+        function toggleAvailability(carId, currentStatus) {
+            if (confirm('Are you sure you want to change the availability status?')) {
+                // This would typically make an AJAX call to update availability
+                // For now, we'll just reload the page
+                window.location.reload();
+            }
+        }
+    </script>
+}

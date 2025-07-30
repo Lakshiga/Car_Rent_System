@@ -1,0 +1,237 @@
+@model Car_Rent_System.Models.Car
+
+@{
+    ViewData["Title"] = "Add New Car";
+}
+
+<div class="container-fluid" style="padding-top: 100px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="cynex-card p-5">
+                <div class="text-center mb-5">
+                    <h2 class="cynex-font text-cynex-silver mb-3">
+                        <i class="fas fa-plus-circle text-cynex-red"></i> ADD NEW LUXURY VEHICLE
+                    </h2>
+                    <p class="text-muted">Expand the CYNEX BLAZER elite fleet with another premium automobile</p>
+                </div>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> @ViewBag.Error
+                    </div>
+                }
+
+                <form asp-action="AddCar" method="post" enctype="multipart/form-data" id="addCarForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="CarName" class="form-label">
+                                <i class="fas fa-car text-cynex-red"></i> Car Name *
+                            </label>
+                            <input asp-for="CarName" class="form-control" required placeholder="e.g., BMW M5 Competition">
+                            <span asp-validation-for="CarName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="CarModel" class="form-label">
+                                <i class="fas fa-calendar text-cynex-red"></i> Model Year *
+                            </label>
+                            <input asp-for="CarModel" class="form-control" required placeholder="e.g., 2024">
+                            <span asp-validation-for="CarModel" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="CarType" class="form-label">
+                                <i class="fas fa-tag text-cynex-red"></i> Car Type *
+                            </label>
+                            <select asp-for="CarType" class="form-control" required>
+                                <option value="">Select car type</option>
+                                <option value="Supercar">Supercar</option>
+                                <option value="Luxury Sedan">Luxury Sedan</option>
+                                <option value="Luxury SUV">Luxury SUV</option>
+                                <option value="Sports Car">Sports Car</option>
+                                <option value="Grand Tourer">Grand Tourer</option>
+                                <option value="Convertible">Convertible</option>
+                            </select>
+                            <span asp-validation-for="CarType" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="DailyRate" class="form-label">
+                                <i class="fas fa-dollar-sign text-cynex-red"></i> Daily Rate ($) *
+                            </label>
+                            <input asp-for="DailyRate" type="number" step="0.01" class="form-control" required placeholder="299.00">
+                            <span asp-validation-for="DailyRate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <label asp-for="FuelType" class="form-label">
+                                <i class="fas fa-gas-pump text-cynex-red"></i> Fuel Type *
+                            </label>
+                            <select asp-for="FuelType" class="form-control" required>
+                                <option value="">Select fuel type</option>
+                                <option value="Petrol">Petrol</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Hybrid">Hybrid</option>
+                                <option value="Electric">Electric</option>
+                            </select>
+                            <span asp-validation-for="FuelType" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <label asp-for="Transmission" class="form-label">
+                                <i class="fas fa-cogs text-cynex-red"></i> Transmission *
+                            </label>
+                            <select asp-for="Transmission" class="form-control" required>
+                                <option value="">Select transmission</option>
+                                <option value="Automatic">Automatic</option>
+                                <option value="Manual">Manual</option>
+                                <option value="CVT">CVT</option>
+                            </select>
+                            <span asp-validation-for="Transmission" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <label asp-for="SeatingCapacity" class="form-label">
+                                <i class="fas fa-users text-cynex-red"></i> Seating Capacity *
+                            </label>
+                            <select asp-for="SeatingCapacity" class="form-control" required>
+                                <option value="">Select capacity</option>
+                                <option value="2">2 Seats</option>
+                                <option value="4">4 Seats</option>
+                                <option value="5">5 Seats</option>
+                                <option value="7">7 Seats</option>
+                                <option value="8">8 Seats</option>
+                            </select>
+                            <span asp-validation-for="SeatingCapacity" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Mileage" class="form-label">
+                                <i class="fas fa-leaf text-cynex-red"></i> Mileage (km/l)
+                            </label>
+                            <input asp-for="Mileage" type="number" step="0.1" class="form-control" placeholder="12.5">
+                            <span asp-validation-for="Mileage" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="imageFile" class="form-label">
+                                <i class="fas fa-image text-cynex-red"></i> Car Image
+                            </label>
+                            <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*">
+                            <small class="text-muted">Upload a high-quality image of the vehicle</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Description" class="form-label">
+                            <i class="fas fa-align-left text-cynex-red"></i> Description
+                        </label>
+                        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe the luxury features and performance of this vehicle..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input asp-for="IsAvailable" class="form-check-input" type="checkbox" checked>
+                            <label asp-for="IsAvailable" class="form-check-label text-cynex-silver">
+                                Available for rental
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Image Preview -->
+                    <div class="mb-4" id="imagePreview" style="display: none;">
+                        <label class="form-label text-cynex-silver">
+                            <i class="fas fa-eye text-cynex-red"></i> Image Preview
+                        </label>
+                        <div class="text-center">
+                            <img id="previewImg" src="/placeholder.svg" alt="Preview" class="img-fluid rounded" style="max-height: 300px; border: 2px solid var(--cynex-red);">
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="ManageCars" class="btn btn-cynex-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Back to Fleet
+                        </a>
+                        <button type="submit" class="btn btn-cynex-primary btn-lg">
+                            <i class="fas fa-plus"></i> ADD TO FLEET
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Image preview functionality
+        document.getElementById('imageFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').style.display = 'none';
+            }
+        });
+
+        // Form validation
+        document.getElementById('addCarForm').addEventListener('submit', function(e) {
+            const requiredFields = ['CarName', 'CarModel', 'CarType', 'DailyRate', 'FuelType', 'Transmission', 'SeatingCapacity'];
+            let isValid = true;
+
+            requiredFields.forEach(function(fieldName) {
+                const field = document.querySelector(`[name="${fieldName}"]`);
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                showAlert('Please fill in all required fields.', 'danger');
+            }
+        });
+
+        // Real-time validation
+        document.querySelectorAll('input, select, textarea').forEach(function(field) {
+            field.addEventListener('blur', function() {
+                if (this.hasAttribute('required') && !this.value.trim()) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                    if (this.value.trim()) {
+                        this.classList.add('is-valid');
+                    }
+                }
+            });
+        });
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const form = document.getElementById('addCarForm');
+            form.insertBefore(alertDiv, form.firstChild);
+            
+            setTimeout(function() {
+                alertDiv.remove();
+            }, 5000);
+        }
+    </script>
+}
