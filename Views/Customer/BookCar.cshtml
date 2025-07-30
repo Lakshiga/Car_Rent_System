@@ -1,0 +1,228 @@
+﻿@model Car_Rent_System.Models.Booking
+
+@{
+    ViewData["Title"] = "Book Car";
+    var car = ViewBag.Car as Car_Rent_System.Models.Car;
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-calendar-plus"></i> Book Your Car
+                    </h4>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i> @ViewBag.Error
+                        </div>
+                    }
+
+                    <form asp-action="BookCar" method="post" onsubmit="return validateBookingDates()">
+                        <input type="hidden" asp-for="CarID" />
+                        <input type="hidden" id="DailyRate" value="@car?.DailyRate" />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PickupDate" class="form-label">
+                                    <i class="fas fa-calendar-alt"></i> Pickup Date *
+                                </label>
+                                <input asp-for="PickupDate" type="date" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                                <span asp-validation-for="PickupDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ReturnDate" class="form-label">
+                                    <i class="fas fa-calendar-alt"></i> Return Date *
+                                </label>
+                                <input asp-for="ReturnDate" type="date" class="form-control" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" required />
+                                <span asp-validation-for="ReturnDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PickupLocation" class="form-label">
+                                    <i class="fas fa-map-marker-alt"></i> Pickup Location
+                                </label>
+                                <select asp-for="PickupLocation" class="form-select">
+                                    <option value="">Select pickup location</option>
+                                    <option value="Downtown Branch">Downtown Branch</option>
+                                    <option value="Airport Terminal">Airport Terminal</option>
+                                    <option value="Mall Location">Mall Location</option>
+                                    <option value="Hotel Pickup">Hotel Pickup</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ReturnLocation" class="form-label">
+                                    <i class="fas fa-map-marker-alt"></i> Return Location
+                                </label>
+                                <select asp-for="ReturnLocation" class="form-select">
+                                    <option value="">Select return location</option>
+                                    <option value="Downtown Branch">Downtown Branch</option>
+                                    <option value="Airport Terminal">Airport Terminal</option>
+                                    <option value="Mall Location">Mall Location</option>
+                                    <option value="Hotel Pickup">Hotel Pickup</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="SpecialRequirements" class="form-label">
+                                <i class="fas fa-comment"></i> Special Requirements
+                            </label>
+                            <textarea asp-for="SpecialRequirements" class="form-control" rows="3" placeholder="Any special requests or requirements..."></textarea>
+                        </div>
+
+                        <!-- Booking Summary -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Booking Summary</h5>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p class="mb-1"><strong>Total Days:</strong> <span id="TotalDays">-</span></p>
+                                        <p class="mb-1"><strong>Daily Rate:</strong> $@car?.DailyRate</p>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <h4 class="text-primary"><strong>Total Cost: <span id="TotalCost">$0.00</span></strong></h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="BrowseCars" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-arrow-left"></i> Back to Cars
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check"></i> Confirm Booking
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Car Details Card -->
+            <div class="card sticky-top">
+                <img src="~/images/Lambogini.jpg" class="car-image" alt="BMW M5 Competition"
+                     class="card-img-top" style="height: 200px; object-fit: cover;" alt="@car?.CarName" />
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">@car?.CarName</h5>
+                    <p class="text-muted">@car?.CarModel | @car?.CarType</p>
+
+                    @if (!string.IsNullOrEmpty(car?.Description))
+                    {
+                        <p class="card-text">@car.Description</p>
+                    }
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-users"></i> @car?.SeatingCapacity Seats
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-gas-pump"></i> @car?.FuelType
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-cogs"></i> @car?.Transmission
+                            </small>
+                        </div>
+                        @if (car?.Mileage != null)
+                        {
+                            <div class="col-6">
+                                <small class="text-success">
+                                    <i class="fas fa-leaf"></i> @car.Mileage km/l
+                                </small>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="text-center">
+                        <span class="price-tag fs-4">$@car?.DailyRate/day</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terms and Conditions -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fas fa-info-circle"></i> Important Information
+                    </h6>
+                    <ul class="list-unstyled small">
+                        <li><i class="fas fa-check text-success"></i> Valid driver's license required</li>
+                        <li><i class="fas fa-check text-success"></i> Minimum age: 21 years</li>
+                        <li><i class="fas fa-check text-success"></i> Full insurance coverage included</li>
+                        <li><i class="fas fa-check text-success"></i> 24/7 roadside assistance</li>
+                        <li><i class="fas fa-check text-success"></i> Free cancellation up to 24 hours</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function validateBookingDates() {
+            var pickupDate = new Date($('#PickupDate').val());
+            var returnDate = new Date($('#ReturnDate').val());
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (pickupDate < today) {
+                alert('Pickup date cannot be in the past.');
+                return false;
+            }
+
+            if (returnDate <= pickupDate) {
+                alert('Return date must be after pickup date.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function calculateTotalCost() {
+            var pickupDate = new Date($('#PickupDate').val());
+            var returnDate = new Date($('#ReturnDate').val());
+            var dailyRate = parseFloat($('#DailyRate').val()) || 0;
+
+            if (pickupDate && returnDate && returnDate > pickupDate) {
+                var timeDiff = returnDate.getTime() - pickupDate.getTime();
+                var daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+                var totalCost = daysDiff * dailyRate;
+
+                $('#TotalDays').text(daysDiff + ' day' + (daysDiff > 1 ? 's' : ''));
+                $('#TotalCost').text('$' + totalCost.toFixed(2));
+            } else {
+                $('#TotalDays').text('-');
+                $('#TotalCost').text('$0.00');
+            }
+        }
+
+        // Attach event listeners
+        $('#PickupDate, #ReturnDate').on('change', calculateTotalCost);
+
+        // Set return location same as pickup by default
+        $('#PickupLocation').on('change', function () {
+            if ($('#ReturnLocation').val() === '') {
+                $('#ReturnLocation').val($(this).val());
+            }
+        });
+
+        // Initialize calculation on page load
+        $(document).ready(function () {
+            calculateTotalCost();
+        });
+    </script>
+}
