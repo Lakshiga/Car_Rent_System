@@ -1,0 +1,90 @@
+﻿@model Car_Rent_System.Models.OwnDrivers
+
+@{
+    ViewData["Title"] = "Own Drivers Dashboard";
+}
+
+<div class="container py-5">
+    <h1 class="display-6 fw-bold">
+        <i class="fas fa-tachometer-alt"></i> Welcome, @Context.Session.GetString("FullName")!
+    </h1>
+
+    <!-- Personal Info -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">Personal Info</div>
+        <div class="card-body">
+            <p><strong>Name:</strong> @Model.Fname @Model.Lname</p>
+            <p><strong>Address:</strong> @Model.Address</p>
+            <p><strong>NIC:</strong> @Model.NIC</p>
+            <p><strong>Driver License:</strong> @Model.DriversLicense_No</p>
+            <p><strong>Experience:</strong> @Model.Experience years</p>
+            
+        </div>
+    </div>
+
+    <!-- Current Trip -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">Current Trip</div>
+        <div class="card-body">
+            @if (!string.IsNullOrEmpty(Model.CurrentTripCustomer))
+            {
+                <p><strong>Customer:</strong> @Model.CurrentTripCustomer</p>
+                <p><strong>Trip Start:</strong> @Model.TripStartTime</p>
+                <p><strong>Trip End:</strong> @Model.TripEndTime</p>
+                <p><strong>Pickup:</strong> @Model.PickupLocation</p>
+                <p><strong>Drop:</strong> @Model.DropLocation</p>
+            }
+            else
+            {
+                <p>No active trip.</p>
+            }
+        </div>
+    </div>
+
+    <!-- Earnings -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">Earnings</div>
+        <div class="card-body">
+            <p><strong>Today:</strong> Rs. @Model.TodayEarnings</p>
+            <p><strong>Weekly:</strong> Rs. @Model.WeeklyEarnings</p>
+            <p><strong>Monthly:</strong> Rs. @Model.MonthlyEarnings</p>
+            <p><strong>Pending Payments:</strong> Rs. @Model.PendingPayments</p>
+        </div>
+    </div>
+
+    <!-- Status -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">Status</div>
+        <div class="card-body">
+            <p><strong>Availability:</strong> @(Model.IsActive ? "Active" : "Inactive")</p>
+            <p><strong>Ready for Trips:</strong> @(Model.ReadyForTrips ? "Yes" : "No")</p>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">Notifications</div>
+        <div class="card-body">
+            <ul>
+                @foreach (var note in Model.Notifications)
+                {
+                    <li>@note</li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <!-- Reviews -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">Reviews</div>
+        <div class="card-body">
+            <p><strong>Average Rating:</strong> ⭐ @Model.AverageRating</p>
+            <ul>
+                @foreach (var feedback in Model.CustomerFeedback)
+                {
+                    <li>"@feedback"</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

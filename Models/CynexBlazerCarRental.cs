@@ -14,6 +14,8 @@ namespace Car_Rent_System.Models
         public DbSet<Car> Cars { get; set; }
         public DbSet<Booking> Bookings { get; set; }
 
+        public DbSet<OwnDrivers>OwnDrives { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
