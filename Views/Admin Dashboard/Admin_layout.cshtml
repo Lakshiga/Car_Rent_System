@@ -1,0 +1,502 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex vh-100">
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar bg-secondary" style="width: 280px; min-width: 280px;">
+        <!-- Header -->
+        <div class="sidebar-header p-3 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2" id="logo-section">
+                <div class="logo-icon bg-danger rounded d-flex align-items-center justify-content-center"
+                     style="width: 40px; height: 40px;">
+                    <i class="bi bi-car-front text-white"></i>
+                </div>
+                <span class="fw-bold fs-5 text-white">RentFlow</span>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" id="sidebar-toggle">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+
+        <!-- Navigation -->
+        <div class="sidebar-nav px-3 flex-grow-1">
+            <div class="nav-item mb-1">
+                <a asp-page="/Admin/Dashboard" class="nav-link active d-flex align-items-center gap-2 p-3 rounded text-decoration-none">
+                    <i class="bi bi-bar-chart"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item mb-1">
+                <a asp-page="/Admin/FleetManagement" class="nav-link d-flex align-items-center gap-2 p-3 rounded text-decoration-none">
+                    <i class="bi bi-car-front"></i>
+                    <span class="nav-text">Fleet Management</span>
+                </a>
+            </div>
+            <div class="nav-item mb-1">
+                <a href="@Url.Action("Customers", "Admin")" class="nav-link d-flex align-items-center gap-2 p-3 rounded text-decoration-none">
+                    <i class="bi bi-people"></i>
+                    <span class="nav-text">Customers</span>
+                </a>
+            </div>
+            <div class="nav-item mb-1">
+                <a href="@Url.Action("Reservations", "Admin")" class="nav-link d-flex align-items-center gap-2 p-3 rounded text-decoration-none">
+                    <i class="bi bi-calendar"></i>
+                    <span class="nav-text">Reservations</span>
+                </a>
+            </div>
+            <div class="nav-item mb-1">
+                <a href="@Url.Action("Revenue", "Admin")" class="nav-link d-flex align-items-center gap-2 p-3 rounded text-decoration-none">
+                    <i class="bi bi-currency-dollar"></i>
+                    <span class="nav-text">Revenue</span>
+                </a>
+            </div>
+            <div class="nav-item mb-1">
+                <a href="@Url.Action("Locations", "Admin")" class="nav-link d-flex align-items-center gap-2 p-3 rounded text-decoration-none">
+                    <i class="bi bi-geo-alt"></i>
+                    <span class="nav-text">Locations</span>
+                </a>
+            </div>
+            <div class="nav-item mb-1">
+                <a href="@Url.Action("Settings", "Admin")" class="nav-link d-flex align-items-center gap-2 p-3 rounded text-decoration-none">
+                    <i class="bi bi-gear"></i>
+                    <span class="nav-text">Settings</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Daily Inspiration Card -->
+        <div class="p-3" id="inspiration-card">
+            <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-stars text-white"></i>
+                        <span class="fw-semibold text-white">Daily Inspiration</span>
+                    </div>
+                    <p class="card-text small text-white opacity-75 mb-2">
+                        Every rental is an opportunity to create memorable experiences.
+                    </p>
+                    <div class="text-white">⭐</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="flex-grow-1 d-flex flex-column">
+        <!-- Header -->
+        <header class="header bg-secondary border-bottom border-dark p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div>
+                        <h1 class="h3 fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                            Welcome back, Admin!
+                            <span>👋</span>
+                        </h1>
+                        <p class="text-muted small mb-0" id="current-date">@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Search -->
+                    <div class="position-relative">
+                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input type="text" class="form-control bg-dark border-secondary text-white ps-5"
+                               placeholder="Search..." style="width: 250px;">
+                    </div>
+
+                    <!-- Notifications -->
+                    <button class="btn btn-outline-secondary position-relative">
+                        <i class="bi bi-bell"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span>
+                    </button>
+
+                    <!-- Theme Toggle -->
+                    <button class="btn btn-outline-secondary" id="theme-toggle">
+                        <i class="bi bi-sun"></i>
+                    </button>
+
+                    <!-- User Profile -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary">
+                            <li><a class="dropdown-item text-white" href="#">Profile</a></li>
+                            <li><a class="dropdown-item text-white" href="#">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow-1 p-4 overflow-auto" id="main-content">
+            <!-- Stats Cards Row -->
+            <div class="row g-4 mb-4">
+                <!-- Total Revenue Card -->
+                <div class="col-md-3">
+                    <div class="card bg-dark border-secondary h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <p class="text-muted mb-1">Total Revenue</p>
+                                    <h4 class="text-white mb-0">$124,500</h4>
+                                    <small class="text-success">
+                                        <i class="bi bi-arrow-up"></i> +12.5%
+                                    </small>
+                                </div>
+                                <div class="text-danger">
+                                    <i class="bi bi-currency-dollar fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Rentals Card -->
+                <div class="col-md-3">
+                    <div class="card bg-dark border-secondary h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <p class="text-muted mb-1">Active Rentals</p>
+                                    <h4 class="text-white mb-0">89</h4>
+                                    <small class="text-success">
+                                        <i class="bi bi-arrow-up"></i> +8.2%
+                                    </small>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="bi bi-car-front fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Customers Card -->
+                <div class="col-md-3">
+                    <div class="card bg-dark border-secondary h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <p class="text-muted mb-1">Total Customers</p>
+                                    <h4 class="text-white mb-0">2,847</h4>
+                                    <small class="text-success">
+                                        <i class="bi bi-arrow-up"></i> +15.3%
+                                    </small>
+                                </div>
+                                <div class="text-warning">
+                                    <i class="bi bi-people fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fleet Utilization Card -->
+                <div class="col-md-3">
+                    <div class="card bg-dark border-secondary h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <p class="text-muted mb-1">Fleet Utilization</p>
+                                    <h4 class="text-white mb-0">78%</h4>
+                                    <small class="text-success">
+                                        <i class="bi bi-arrow-up"></i> +5.1%
+                                    </small>
+                                </div>
+                                <div class="text-info">
+                                    <i class="bi bi-graph-up fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Dashboard Content Row -->
+            <div class="row g-4">
+                <!-- Recent Rentals -->
+                <div class="col-md-8">
+                    <div class="card bg-dark border-secondary">
+                        <div class="card-header bg-transparent border-secondary">
+                            <h5 class="text-white mb-0">
+                                <i class="bi bi-clock me-2"></i>Recent Rentals
+                            </h5>
+                            <small class="text-muted">Latest rental activities</small>
+                        </div>
+                        <div class="card-body">
+                            <!-- Rental Entry 1 -->
+                            <div class="d-flex align-items-center justify-content-between py-3 border-bottom border-secondary">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px;">
+                                        <i class="bi bi-person text-white"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white fw-medium">John Smith</div>
+                                        <div class="text-muted small">Tesla Model 3 • #RT001</div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-success mb-1">Active</span>
+                                    <div class="text-muted small">2 hours ago</div>
+                                </div>
+                            </div>
+
+                            <!-- Rental Entry 2 -->
+                            <div class="d-flex align-items-center justify-content-between py-3 border-bottom border-secondary">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px;">
+                                        <i class="bi bi-person text-white"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white fw-medium">Sarah Johnson</div>
+                                        <div class="text-muted small">BMW X5 • #RT002</div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-primary mb-1">Completed</span>
+                                    <div class="text-muted small">4 hours ago</div>
+                                </div>
+                            </div>
+
+                            <!-- Rental Entry 3 -->
+                            <div class="d-flex align-items-center justify-content-between py-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-info rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px;">
+                                        <i class="bi bi-person text-white"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white fw-medium">Mike Wilson</div>
+                                        <div class="text-muted small">Audi A4 • #RT003</div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-warning mb-1">Pending</span>
+                                    <div class="text-muted small">6 hours ago</div>
+                                </div>
+                            </div>
+
+                            <!-- View All Button -->
+                            <div class="text-center mt-3">
+                                <a href="@Url.Action("Reservations", "Admin")" class="btn btn-outline-primary">
+                                    View All Rentals <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fleet Performance -->
+                <div class="col-md-4">
+                    <div class="card bg-dark border-secondary h-100">
+                        <div class="card-header bg-transparent border-secondary">
+                            <h5 class="text-white mb-0">
+                                <i class="bi bi-star me-2"></i>Fleet Performance
+                            </h5>
+                            <small class="text-muted">Vehicle status overview</small>
+                        </div>
+                        <div class="card-body">
+                            <!-- Available Vehicles -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-white">Available</span>
+                                    <span class="text-white fw-bold">45 vehicles</span>
+                                </div>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar bg-success"
+                                         style="width: 70%"
+                                         role="progressbar"
+                                         aria-valuenow="70"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100"></div>
+                                </div>
+                                <small class="text-muted">70% of fleet</small>
+                            </div>
+
+                            <!-- Rented Vehicles -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-white">Rented</span>
+                                    <span class="text-white fw-bold">18 vehicles</span>
+                                </div>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar bg-danger"
+                                         style="width: 28%"
+                                         role="progressbar"
+                                         aria-valuenow="28"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100"></div>
+                                </div>
+                                <small class="text-muted">28% of fleet</small>
+                            </div>
+
+                            <!-- Maintenance Vehicles -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-white">Maintenance</span>
+                                    <span class="text-white fw-bold">6 vehicles</span>
+                                </div>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar bg-warning"
+                                         style="width: 9%"
+                                         role="progressbar"
+                                         aria-valuenow="9"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100"></div>
+                                </div>
+                                <small class="text-muted">9% of fleet</small>
+                            </div>
+
+                            <!-- Quick Actions -->
+                            <div class="mt-4">
+                                <h6 class="text-white mb-3">Quick Actions</h6>
+                                <div class="d-grid gap-2">
+                                    <a href="@Url.Action("FleetManagement", "Admin")" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-plus-circle me-1"></i> Add New Vehicle
+                                    </a>
+                                    <a href="@Url.Action("Reservations", "Admin")" class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-calendar-plus me-1"></i> New Booking
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Dashboard Content -->
+            <div class="row g-4 mt-2">
+                <!-- Monthly Revenue Chart Placeholder -->
+                <div class="col-md-8">
+                    <div class="card bg-dark border-secondary">
+                        <div class="card-header bg-transparent border-secondary">
+                            <h5 class="text-white mb-0">
+                                <i class="bi bi-graph-up me-2"></i>Monthly Revenue Trend
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center text-muted py-5">
+                                <i class="bi bi-graph-up fs-1 mb-3"></i>
+                                <p>Revenue chart will be implemented with Chart.js</p>
+                                <small>Connect to your revenue data source</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Customers -->
+                <div class="col-md-4">
+                    <div class="card bg-dark border-secondary">
+                        <div class="card-header bg-transparent border-secondary">
+                            <h5 class="text-white mb-0">
+                                <i class="bi bi-trophy me-2"></i>Top Customers
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between py-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-warning rounded-pill">1</span>
+                                    <span class="text-white">John Smith</span>
+                                </div>
+                                <span class="text-success">$2,450</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between py-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-secondary rounded-pill">2</span>
+                                    <span class="text-white">Sarah Johnson</span>
+                                </div>
+                                <span class="text-success">$1,890</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between py-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-dark rounded-pill">3</span>
+                                    <span class="text-white">Mike Wilson</span>
+                                </div>
+                                <span class="text-success">$1,650</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Current date display
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentDate = document.getElementById('current-date');
+            if (currentDate && !currentDate.textContent.trim()) {
+                const now = new Date();
+                currentDate.textContent = now.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-bs-theme', newTheme);
+
+                    const icon = this.querySelector('i');
+                    icon.className = newTheme === 'dark' ? 'bi bi-sun' : 'bi bi-moon';
+                });
+            }
+
+            // Sidebar toggle functionality
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebar = document.getElementById('sidebar');
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.style.display = sidebar.style.display === 'none' ? 'block' : 'none';
+                });
+            }
+        });
+    </script>
+
+    <style>
+        .nav-link {
+            color: #adb5bd !important;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #fff !important;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active {
+            color: #fff !important;
+            background-color: #0d6efd;
+        }
+
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+
+        .card {
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+    </style>
+}
