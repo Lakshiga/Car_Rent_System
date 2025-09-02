@@ -6,6 +6,9 @@ namespace Car_Rent_System.Models
     public class Car
     {
         [Key]
+
+
+        // models update
         public int CarID { get; set; }
 
         [Required(ErrorMessage = "Car name is required")]
