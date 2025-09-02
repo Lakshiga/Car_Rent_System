@@ -1,22 +1,35 @@
-html {
-  font-size: 14px;
+:root {
+    --cynex-blue: #0A2472;
+    --cynex-silver: #ccc; /* or your desired silver tone */
+    --cynex-blue-gradient: linear-gradient(90deg, #0A2472 0%, #0a3b8a 100%);
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+.text-cynex-blue {
+    color: var(--cynex-blue) !important;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.bg-cynex-blue {
+    background-color: var(--cynex-blue) !important;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+.btn-cynex-primary {
+    background: var(--cynex-blue);
+    color: #fff;
+    border: none;
 }
 
-body {
-  margin-bottom: 60px;
+    .btn-cynex-primary:hover {
+        background: #0a3b8a;
+        color: #fff;
+    }
+
+.btn-cynex-secondary {
+    background-color: transparent;
+    color: var(--cynex-blue);
+    border: 2px solid var(--cynex-blue);
 }
+
+    .btn-cynex-secondary:hover {
+        background-color: var(--cynex-blue);
+        color: #fff;
+    }
