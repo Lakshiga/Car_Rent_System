@@ -12,11 +12,11 @@
         :root {
             --cynex-black: #000000;
             --cynex-silver: #C0C0C0;
-            --cynex-red: #FF0000;
+            --cynex-blue: #0A2472;
             --cynex-dark-silver: #808080;
             --cynex-light-silver: #E8E8E8;
             --cynex-gradient: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
-            --cynex-red-gradient: linear-gradient(45deg, #FF0000, #FF4444);
+            --cynex-blue-gradient: linear-gradient(45deg, #0A2472, #0D3B9E);
             --cynex-silver-gradient: linear-gradient(45deg, #C0C0C0, #E8E8E8);
         }
 
@@ -41,7 +41,7 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: radial-gradient(circle at 20% 80%, rgba(255, 0, 0, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(192, 192, 192, 0.1) 0%, transparent 50%), var(--cynex-black);
+                background: radial-gradient(circle at 20% 80%, rgba(10, 36, 114, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(192, 192, 192, 0.1) 0%, transparent 50%), var(--cynex-black);
                 z-index: -1;
             }
 
@@ -56,22 +56,22 @@
             color: var(--cynex-silver) !important;
         }
 
-        .text-cynex-red {
-            color: var(--cynex-red) !important;
+        .text-cynex-blue {
+            color: var(--cynex-blue) !important;
         }
 
         .navbar {
             background: rgba(0, 0, 0, 0.95) !important;
             backdrop-filter: blur(10px);
-            border-bottom: 2px solid var(--cynex-red);
-            box-shadow: 0 4px 20px rgba(255, 0, 0, 0.3);
+            border-bottom: 2px solid var(--cynex-blue);
+            box-shadow: 0 4px 20px rgba(10, 36, 114, 0.3);
             padding: 1rem 0;
             transition: all 0.3s ease;
         }
 
             .navbar.scrolled {
                 background: rgba(0, 0, 0, 0.98) !important;
-                box-shadow: 0 4px 30px rgba(255, 0, 0, 0.5);
+                box-shadow: 0 4px 30px rgba(10, 36, 114, 0.5);
             }
 
         .navbar-brand {
@@ -86,7 +86,7 @@
         }
 
             .navbar-brand:hover {
-                color: var(--cynex-red) !important;
+                color: var(--cynex-blue) !important;
                 transform: scale(1.05);
             }
 
@@ -94,12 +94,12 @@
                 height: 50px;
                 width: auto;
                 margin-right: 15px;
-                filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5));
+                filter: drop-shadow(0 0 10px rgba(10, 36, 114, 0.5));
                 transition: all 0.3s ease;
             }
 
             .navbar-brand:hover img {
-                filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.8));
+                filter: drop-shadow(0 0 20px rgba(10, 36, 114, 0.8));
                 transform: rotate(5deg);
             }
 
@@ -122,7 +122,7 @@
                 left: -100%;
                 width: 100%;
                 height: 100%;
-                background: var(--cynex-red-gradient);
+                background: var(--cynex-blue-gradient);
                 transition: all 0.3s ease;
                 z-index: -1;
             }
@@ -137,7 +137,7 @@
                 }
 
         .btn-cynex-primary {
-            background: var(--cynex-red-gradient);
+            background: var(--cynex-blue-gradient);
             border: none;
             color: white;
             font-weight: 600;
@@ -146,7 +146,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(10, 36, 114, 0.3);
             position: relative;
             overflow: hidden;
         }
@@ -158,14 +158,14 @@
                 left: -100%;
                 width: 100%;
                 height: 100%;
-                background: linear-gradient(45deg, #FF4444, #FF0000);
+                background: linear-gradient(45deg, #0D3B9E, #0A2472);
                 transition: all 0.3s ease;
                 z-index: -1;
             }
 
             .btn-cynex-primary:hover {
                 transform: translateY(-3px);
-                box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
+                box-shadow: 0 8px 25px rgba(10, 36, 114, 0.5);
                 color: white;
             }
 
@@ -227,15 +227,15 @@
                 left: 0;
                 right: 0;
                 height: 3px;
-                background: var(--cynex-red-gradient);
+                background: var(--cynex-blue-gradient);
                 transform: scaleX(0);
                 transition: transform 0.3s ease;
             }
 
             .cynex-card:hover {
                 transform: translateY(-10px);
-                border-color: var(--cynex-red);
-                box-shadow: 0 20px 40px rgba(255, 0, 0, 0.2);
+                border-color: var(--cynex-blue);
+                box-shadow: 0 20px 40px rgba(10, 36, 114, 0.2);
             }
 
                 .cynex-card:hover::before {
@@ -279,7 +279,7 @@
 
         .stats-card {
             background: rgba(0, 0, 0, 0.9);
-            border: 2px solid var(--cynex-red);
+            border: 2px solid var(--cynex-blue);
             border-radius: 20px;
             padding: 2rem;
             text-align: center;
@@ -299,14 +299,14 @@
 
             .stats-card:hover {
                 transform: scale(1.05);
-                box-shadow: 0 10px 30px rgba(255, 0, 0, 0.4);
+                box-shadow: 0 10px 30px rgba(10, 36, 114, 0.4);
             }
 
         .stats-number {
             font-family: 'Orbitron', monospace;
             font-size: 3rem;
             font-weight: 900;
-            color: var(--cynex-red);
+            color: var(--cynex-blue);
             margin-bottom: 0.5rem;
         }
 
@@ -334,15 +334,15 @@
                 left: 0;
                 right: 0;
                 height: 4px;
-                background: var(--cynex-red-gradient);
+                background: var(--cynex-blue-gradient);
                 transform: scaleX(0);
                 transition: transform 0.3s ease;
             }
 
             .car-card:hover {
                 transform: translateY(-15px);
-                box-shadow: 0 25px 50px rgba(255, 0, 0, 0.3);
-                border-color: var(--cynex-red);
+                box-shadow: 0 25px 50px rgba(10, 36, 114, 0.3);
+                border-color: var(--cynex-blue);
             }
 
                 .car-card:hover::before {
@@ -361,14 +361,14 @@
         }
 
         .price-tag {
-            background: var(--cynex-red-gradient);
+            background: var(--cynex-blue-gradient);
             color: white;
             padding: 8px 20px;
             border-radius: 25px;
             font-weight: 700;
             font-size: 1.2rem;
             display: inline-block;
-            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(10, 36, 114, 0.3);
         }
 
         .form-control {
@@ -383,8 +383,8 @@
 
             .form-control:focus {
                 background: rgba(0, 0, 0, 0.9);
-                border-color: var(--cynex-red);
-                box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+                border-color: var(--cynex-blue);
+                box-shadow: 0 0 20px rgba(10, 36, 114, 0.3);
                 color: white;
             }
 
@@ -408,7 +408,7 @@
         }
 
             .table th {
-                background: var(--cynex-red);
+                background: var(--cynex-blue);
                 color: white;
                 font-weight: 700;
                 text-transform: uppercase;
@@ -424,7 +424,7 @@
             }
 
             .table tbody tr:hover {
-                background: rgba(255, 0, 0, 0.1);
+                background: rgba(10, 36, 114, 0.1);
             }
 
         .badge {
@@ -441,7 +441,7 @@
             }
 
             .badge.bg-danger {
-                background: var(--cynex-red-gradient) !important;
+                background: var(--cynex-blue-gradient) !important;
             }
 
         .alert {
@@ -459,21 +459,21 @@
         }
 
         .alert-danger {
-            background: rgba(255, 0, 0, 0.1);
-            color: var(--cynex-red);
-            border-left-color: var(--cynex-red);
+            background: rgba(10, 36, 114, 0.1);
+            color: var(--cynex-blue);
+            border-left-color: var(--cynex-blue);
         }
 
         .footer {
             background: var(--cynex-black);
-            border-top: 3px solid var(--cynex-red);
+            border-top: 3px solid var(--cynex-blue);
             color: var(--cynex-silver);
             padding: 4rem 0 2rem;
             margin-top: 5rem;
         }
 
             .footer h5 {
-                color: var(--cynex-red);
+                color: var(--cynex-blue);
                 font-family: 'Orbitron', monospace;
                 font-weight: 700;
                 text-transform: uppercase;
@@ -488,7 +488,7 @@
             }
 
                 .footer a:hover {
-                    color: var(--cynex-red);
+                    color: var(--cynex-blue);
                     transform: translateX(5px);
                 }
 
@@ -520,7 +520,7 @@
             height: 20px;
             border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top-color: var(--cynex-red);
+            border-top-color: var(--cynex-blue);
         }
 
         ::-webkit-scrollbar {
@@ -532,12 +532,12 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--cynex-red-gradient);
+            background: var(--cynex-blue-gradient);
             border-radius: 6px;
         }
 
             ::-webkit-scrollbar-thumb:hover {
-                background: linear-gradient(45deg, #FF4444, #FF6666);
+                background: linear-gradient(45deg, #0D3B9E, #1F5FBF);
             }
 
         /* Mobile Responsive Styles */
@@ -567,7 +567,7 @@
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNavbar">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="~/images/1001491317.jpg" alt="CYNEX BLAZER Logo">
+                    <img src="~/images/Cynex Blazer.png" alt="CYNEX BLAZER Logo">
                     <span class="cynex-font">CYNEX BLAZER</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
@@ -612,7 +612,7 @@
                                             </a>
                                         </li>
                                     }
-                                    else
+                                    else if (Context.Session.GetString("Role") == "Customer")
                                     {
                                         <li>
                                             <a class="dropdown-item" asp-controller="Customer" asp-action="Dashboard">
@@ -622,6 +622,15 @@
                                         <li>
                                             <a class="dropdown-item" asp-controller="Customer" asp-action="BookingHistory">
                                                 <i class="fas fa-history"></i> My Bookings
+                                            </a>
+                                        </li>
+                                    }
+
+                                    else if (Context.Session.GetString("Role") == "OwnDrivers")
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="OwnDrivers" asp-action="Dashboard">
+                                                <i class="fas fa-history"></i> Dashboard
                                             </a>
                                         </li>
                                     }
@@ -681,7 +690,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="d-flex align-items-center mb-4">
-                        <img src="~/images/1001491317.jpg" alt="CYNEX BLAZER" style="height: 60px; margin-right: 15px;">
+                        <img src="~/images/Cynex Blazer.png" alt="CYNEX BLAZER" style="height: 60px; margin-right: 15px;">
                         <h5 class="cynex-font mb-0">CYNEX BLAZER</h5>
                     </div>
                     <p>Experience the ultimate in luxury car rentals. Where performance meets prestige, and every journey becomes an adventure.</p>
@@ -712,13 +721,13 @@
                 </div>
                 <div class="col-md-3">
                     <h5>Contact Info</h5>
-                    <p><i class="fas fa-phone text-cynex-red"></i> +1 (555) CYNEX-99</p>
-                    <p><i class="fas fa-envelope text-cynex-red"></i> info@cynexblazer.com</p>
-                    <p><i class="fas fa-map-marker-alt text-cynex-red"></i> 123 Luxury Drive, Elite City</p>
-                    <p><i class="fas fa-clock text-cynex-red"></i> 24/7 Premium Service</p>
+                    <p><i class="fas fa-phone text-cynex-blue"></i> +1 (555) CYNEX-99</p>
+                    <p><i class="fas fa-envelope text-cynex-blue"></i> info@cynexblazer.com</p>
+                    <p><i class="fas fa-map-marker-alt text-cynex-blue"></i> 123 Luxury Drive, Elite City</p>
+                    <p><i class="fas fa-clock text-cynex-blue"></i> 24/7 Premium Service</p>
                 </div>
             </div>
-            <hr class="my-4" style="border-color: var(--cynex-red);">
+            <hr class="my-4" style="border-color: var(--cynex-blue);">
             <div class="row align-items-center">
                 <div class="col-md-6">
                     <p class="mb-0">&copy; 2024 CYNEX BLAZER. All rights reserved. | Luxury Redefined.</p>

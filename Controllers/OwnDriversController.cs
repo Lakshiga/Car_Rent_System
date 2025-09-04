@@ -1,4 +1,4 @@
-﻿`using AspNetCoreGeneratedDocument;
+﻿using AspNetCoreGeneratedDocument;
 using Car_Rent_System.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

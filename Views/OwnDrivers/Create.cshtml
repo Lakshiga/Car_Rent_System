@@ -3,57 +3,73 @@
 
 }
 
-
-
 @model Car_Rent_System.Models.OwnDrivers
-<h2>Create Driver</h2>
 
-<form asp-action="Create" method="post" class="driver-form">
-    <div class="form-group">
-        <label asp-for="Fname"></label>
-        <input asp-for="Fname" class="form-control" placeholder="Enter First Name" />
-        <span asp-validation-for="Fname" class="text-danger"></span>
+<div class="min-vh-100 d-flex align-items-center" style="background: var(--cynex-gradient); padding-top: 100px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="cynex-card p-5">
+                    <div class="text-center mb-5">
+                        <img src="~/images/Cynex Blazer.png" alt="CYNEX BLAZER" style="height: 80px; margin-bottom: 2rem; filter:  drop-shadow(0 0 50px rgba(10, 36, 114, 0.8));">
+                        <h2 class="cynex-font text-cynex-silver mb-3">WELCOME BACK</h2>
+                        <p class="text-muted">Access your elite account</p>
+                    </div>
+
+                    <form asp-action="Create" method="post" class="driver-form">
+                        <div class="form-group">
+                            <label asp-for="Fname"></label>
+                            <input asp-for="Fname" class="form-control" placeholder="Enter First Name" />
+                            <span asp-validation-for="Fname" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Lname"></label>
+                            <input asp-for="Lname" class="form-control" placeholder="Enter Last Name" />
+                            <span asp-validation-for="Lname" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Address"></label>
+                            <input asp-for="Address" class="form-control" placeholder="Enter your Address" />
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Experience"></label>
+                            <input asp-for="Experience" type="number" class="form-control" placeholder="Years of Experience" />
+                            <span asp-validation-for="Experience" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="NIC"></label>
+                            <input asp-for="NIC" class="form-control" placeholder="Enter NIC Number" />
+                            <span asp-validation-for="NIC" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="DriversLicense_No"></label>
+                            <input asp-for="DriversLicense_No" class="form-control" placeholder="Enter Driver’s License Number" />
+                            <span asp-validation-for="DriversLicense_No" class="text-danger"></span>
+                        </div>
+                        <br />
+
+
+
+                        <div class="d-grid mb-4">
+                            <input type="submit" value="Register" class="btn btn-cynex-primary btn-lg" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Lname"></label>
-        <input asp-for="Lname" class="form-control" placeholder="Enter Last Name" />
-        <span asp-validation-for="Lname" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Address"></label>
-        <input asp-for="Address" class="form-control" placeholder="Enter Address" />
-        <span asp-validation-for="Address" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Experience"></label>
-        <input asp-for="Experience" type="number" class="form-control" placeholder="Years of Experience" />
-        <span asp-validation-for="Experience" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="NIC"></label>
-        <input asp-for="NIC" class="form-control" placeholder="Enter NIC Number" />
-        <span asp-validation-for="NIC" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="DriversLicense_No"></label>
-        <input asp-for="DriversLicense_No" class="form-control" placeholder="Enter Driver’s License Number" />
-        <span asp-validation-for="DriversLicense_No" class="text-danger"></span>
-    </div>
-
-    <div class="form-actions mt-3">
-        <input type="submit" value="Create" class="btn btn-primary" />
-        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-    </div>
-</form>
-
+</div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+ 90 changes: 90 additions & 0 deletions90
+Views/OwnDrivers/Dashboard.cshtml

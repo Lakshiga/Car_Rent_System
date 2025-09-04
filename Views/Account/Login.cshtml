@@ -6,9 +6,9 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-5">
-                <div class="cynex-card p-5 animate-fade-in">
+                <div class="cynex-card p-5">
                     <div class="text-center mb-5">
-                        <img src="~/images/1001491317.jpg" alt="CYNEX BLAZER" style="height: 80px; margin-bottom: 2rem; filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.5));">
+                        <img src="~/images/Cynex Blazer.png" alt="CYNEX BLAZER" style="height: 80px; margin-bottom: 2rem; filter:  drop-shadow(0 0 50px rgba(10, 36, 114, 0.8));">
                         <h2 class="cynex-font text-cynex-silver mb-3">WELCOME BACK</h2>
                         <p class="text-muted">Access your elite account</p>
                     </div>
@@ -78,35 +78,64 @@
     </div>
 </div>
 
+
 @section Scripts {
     <script>
-        function validateLogin() {
-            var username = document.getElementById('username').value.trim();
-            var password = document.getElementById('password').value.trim();
+        document.getElementById("login-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-            if (username === '' || password === '') {
-                showAlert('Please enter both username and password.', 'danger');
-                return false;
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+            if (!username || !password) {
+                return showAlert("Please enter both username and password.", "danger");
             }
 
-            return true;
-        }
+            try {
+                const response = await fetch("/api/accountapi/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
 
-        // Add focus effects
-        $('.form-control').focus(function() {
-            $(this).parent().addClass('focused');
-        }).blur(function() {
-            $(this).parent().removeClass('focused');
+                console.log("Status:", response.status, response.statusText);
+                const text = await response.text(); // Always read text first
+
+                if (response.ok) {
+                    const data = text ? JSON.parse(text) : {};
+                    console.log("Response JSON:", data);
+                    localStorage.setItem('jwtToken', data.token);
+                    localStorage.setItem('userRole', data.role);
+                    console.log('Before redirect: token=', localStorage.getItem('jwtToken'));
+
+                    showAlert("Login successful! Redirecting...", "success");
+
+                    await fetch('/Account/LoginSessionSet', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    setTimeout(() => {
+                        const role = data.role;
+                        window.location.href = role === "Admin" ? "/Admin/Dashboard"
+                                            : role === "Customer" ? "/Customer/Dashboard"
+                                            : role === "Staff" ? "/Staff/Dashboard"
+                                            : "/";
+                    }, 1000);
+                } else {
+                    console.error("Response text:", text);
+                    const data = text ? JSON.parse(text) : {};
+                    showAlert(data.error || "Invalid credentials.", "danger");
+                }
+            } catch (error) {
+                console.error("Login error:", error);
+                showAlert("An unexpected error occurred.", "danger");
+            }
         });
 
-        function showAlert(message, type) {
-            var alertDiv = $('<div class="alert alert-' + type + '"><i class="fas fa-exclamation-triangle"></i> ' + message + '</div>');
-            $('.cynex-card').prepend(alertDiv);
-            setTimeout(function() {
-                alertDiv.fadeOut('slow', function() {
-                    $(this).remove();
-                });
-            }, 5000);
+        function showAlert(msg, type) {
+            const c = document.getElementById("login-alert");
+            c.innerHTML = `<div class="alert alert-${type} mt-2"><i class="fas fa-info-circle"></i> ${msg}</div>`;
+            setTimeout(() => c.innerHTML = "", 5000);
         }
     </script>
 }
