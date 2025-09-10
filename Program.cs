@@ -1,4 +1,5 @@
-﻿using Car_Rent_System.Models;
+﻿using Car_Rent_System.DATA;
+using Car_Rent_System.Models;
 using CloudinaryDotNet;
 using dotenv.net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -97,12 +98,17 @@ namespace Car_Rent_System
             // ✅ Ensure database is created
             using (var scope = app.Services.CreateScope())
             {
-                var context = scope.ServiceProvider.GetRequiredService<CynexBlazerContext>();
-                context.Database.EnsureCreated();
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                NewMethod(context);
             }
 
             // ✅ Run the application
             app.Run();
+        }
+
+        private static bool NewMethod(ApplicationDbContext context)
+        {
+            return context.Database.EnsureCreated();
         }
     }
 }

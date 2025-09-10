@@ -1,0 +1,20 @@
+﻿@model Car_Rent_System.ViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="card card-dark p-3" style="max-width:900px;">
+    <div class="d-flex align-items-center">
+        <img src="@Model.ProfileImageUrl ?? " /images/profile-placeholder.png"" style="width:96px; height:96px; border-radius:8px; object-fit:cover;" />
+        <div class="ms-3">
+            <h4>@Model.FullName</h4>
+            <div class="muted">@Model.Role</div>
+            <div>@Model.Email</div>
+        </div>
+    </div>
+</div>
+
+</div>
+    <hr class="my-3" />
+    <a class="btn btn-outline-light" href="/Account/EditProfile">Edit Profile</a>
+</div>

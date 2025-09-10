@@ -1,0 +1,43 @@
+﻿@using Car_Rent_System.Ennum
+@model Car_Rent_System.Models.User2
+
+<div class="bg-dark text-white p-3 vh-100" id="sidebar">
+    <h4 class="mb-4">Admin Panel</h4>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link text-white" asp-controller="AdminDashboard" asp-action="Index">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+        </li>
+
+        @{
+            // Normalize comparisons once, reuse below
+            var isSuperAdmin = string.Equals(Model?. Role, nameof(UserRole.SuperAdmin), StringComparison.OrdinalIgnoreCase);
+            var isSubAdmin = string.Equals(Model?.Role, nameof(UserRole.SubAdmin), StringComparison.OrdinalIgnoreCase);
+        }
+
+        @if (isSuperAdmin || isSubAdmin)
+        {
+            <li class="nav-item">
+                <a class="nav-link text-white" asp-controller="Car" asp-action="ManageCars">
+                    <i class="bi bi-car-front"></i> Manage Cars
+                </a>
+            </li>
+        }
+
+        @if (isSuperAdmin)
+        {
+            <li class="nav-item">
+                <a class="nav-link text-white" asp-controller="User" asp-action="ManageUsers">
+                    <i class="bi bi-people"></i> Manage Users
+                </a>
+            </li>
+        }
+
+        <li class="nav-item">
+            <a class="nav-link text-white" asp-controller="Rental" asp-action="RecentRentals">
+                <i class="bi bi-clock-history"></i> Recent Rentals
+            </a>
+        </li>
+    </ul>
+</div>

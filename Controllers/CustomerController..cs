@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
+﻿using Car_Rent_System.DATA;
 using Car_Rent_System.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Car_Rent_System.Controllers
 {
     public class CustomerController : Controller
     {
-        private readonly CynexBlazerContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public CustomerController(CynexBlazerContext context)
+        public CustomerController(ApplicationDbContext context)
         {
             _context = context;
         }

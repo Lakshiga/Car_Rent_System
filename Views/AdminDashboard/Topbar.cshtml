@@ -1,0 +1,20 @@
+﻿@model Car_Rent_System.Models.User2
+
+<nav class="navbar navbar-expand navbar-light bg-light shadow-sm">
+    <div class="container-fluid">
+        <span class="navbar-brand">Welcome back, @Model?.FullName!</span>
+
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown">
+                    <img src="@Model?.ProfileImageUrl" alt="Profile" class="rounded-circle" width="32" height="32" />
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Profile</a></li>
+                    <li><a class="dropdown-item" asp-controller="Account" asp-action="EditProfile">Edit Profile</a></li>
+                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Logout">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</nav>

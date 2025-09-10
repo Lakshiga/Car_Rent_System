@@ -1,0 +1,110 @@
+﻿@model Car_Rent_System.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="mb-0">Welcome back, Admin! 👋</h3>
+                <small class="muted">Tuesday, August 26, 2025</small>
+            </div>
+            <div>
+                <div class="muted">Font: A A A</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="row gy-3">
+        <div class="col-md-3">
+            <div class="card card-dark p-3">
+                <div class="muted">Total Revenue</div>
+                <h4>@Model.TotalRevenue.ToString("C")</h4>
+                <small class="text-success">+12.5%</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-dark p-3">
+                <div class="muted">Active Rentals</div>
+                <h4>@Model.ActiveRentals</h4>
+                <small class="text-success">+8.2%</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-dark p-3">
+                <div class="muted">Total Customers</div>
+                <h4>@Model.TotalCustomers</h4>
+                <small class="text-success">+15.3%</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-dark p-3">
+                <div class="muted">Fleet Utilization</div>
+                <h4>@Model.FleetUtilizationPercent%</h4>
+                <small class="text-success">+6.1%</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4 gx-3 gy-3">
+        <div class="col-md-6">
+            <div class="card card-dark p-3">
+                <h5>Recent Rentals</h5>
+                <small class="muted">Latest rental activities</small>
+                <ul class="list-group list-group-flush mt-3">
+                    @foreach (var r in Model.RecentRentals)
+                    {
+                        <li class="list-group-item card-dark border-0 d-flex justify-content-between align-items-center">
+                            <div>
+                                <div style="font-weight:600">@r.CustomerName</div>
+                                <div class="muted">@r.CarDisplay</div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge @(
+                                      r.Status == "Active" ? "bg-danger" : r.Status == "Completed" ? "bg-success" : "bg-warning"
+                                                                )">@r.Status</span>
+                            <div class="muted" style="font-size:12px">@r.AgoText</div>
+                        </div>
+                    </li>
+                                        }
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card card-dark p-3">
+                <h5>Fleet Performance</h5>
+                <small class="muted">Vehicle status overview</small>
+
+                <div class="mt-3">
+                    <div class="mb-2 d-flex justify-content-between">
+                        <div>Available</div>
+                        <div>@Model.FleetPerformance.Available vehicles</div>
+                    </div>
+                    <div class="progress mb-3" style="height:10px;">
+                        <div class="progress-bar" role="progressbar" style="width: @(Model.FleetPerformance.Available * 100.0 / (Model.FleetPerformance.Available + Model.FleetPerformance.Rented + Math.Max(1, Model.FleetPerformance.Maintenance)))%"></div>
+                    </div>
+
+                    <div class="mb-2 d-flex justify-content-between">
+                        <div>Rented</div>
+                        <div>@Model.FleetPerformance.Rented vehicles</div>
+                    </div>
+                    <div class="progress mb-3" style="height:10px;">
+                        <div class="progress-bar bg-danger" role="progressbar" style="width: @(Model.FleetPerformance.Rented * 100.0 / (Model.FleetPerformance.Available + Model.FleetPerformance.Rented + Math.Max(1, Model.FleetPerformance.Maintenance)))%"></div>
+                    </div>
+
+                    <div class="mb-2 d-flex justify-content-between">
+                        <div>Maintenance</div>
+                        <div>@Model.FleetPerformance.Maintenance vehicles</div>
+                    </div>
+                    <div class="progress mb-1" style="height:10px;">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: @(Model.FleetPerformance.Maintenance * 100.0 / (Model.FleetPerformance.Available + Model.FleetPerformance.Rented + Math.Max(1, Model.FleetPerformance.Maintenance)))%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

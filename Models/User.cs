@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Car_Rent_System.Ennum;
 using Car_Rent_System.Models;
+ using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Car_Rent_System.Models
 {
@@ -41,7 +42,13 @@ namespace Car_Rent_System.Models
 
         public bool IsActive { get; set; } = true;
 
+        //public string Username { get; set; }
+        public string ProfileImageUrl { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
         // Navigation property
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     }
+
 }
+  

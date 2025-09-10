@@ -1,14 +1,15 @@
-using Microsoft.AspNetCore.Mvc;
+using Car_Rent_System.DATA;
 using Car_Rent_System.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Car_Rent_System.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly CynexBlazerContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(CynexBlazerContext context)
+        public HomeController(ApplicationDbContext context)
         {
             _context = context;
         }

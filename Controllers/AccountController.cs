@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using Car_Rent_System.Models;
+using Car_Rent_System.DATA;
 using Car_Rent_System.Services;  
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
@@ -13,10 +14,10 @@ namespace Car_Rent_System.Controllers
     [Route("api/[controller]")]
     public class AccountApiController : ControllerBase
     {
-        private readonly CynexBlazerContext _context;
+        private readonly ApplicationDbContext _context;
         private readonly IConfiguration _config;
 
-        public AccountApiController(CynexBlazerContext context, IConfiguration config)
+        public AccountApiController(ApplicationDbContext context, IConfiguration config)
         {
             _context = context;
             _config = config;
@@ -49,10 +50,10 @@ namespace Car_Rent_System.Controllers
     [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
-        private readonly CynexBlazerContext _context;
+        private readonly ApplicationDbContext _context;
         private readonly IConfiguration _config;
 
-        public AccountController(CynexBlazerContext context, IConfiguration config)
+        public AccountController(ApplicationDbContext    context, IConfiguration config)
         {
             _context = context;
             _config = config;

@@ -24,7 +24,7 @@ namespace Car_Rent_System.Services
             };
 
             var uploadResult = _cloudinary.Upload(uploadParams);
-            return uploadResult.SecureUrl.ToString(); 
+            return uploadResult.SecureUrl.ToString();
         }
     }
 }

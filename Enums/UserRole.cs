@@ -1,4 +1,4 @@
-﻿namespace Car_Rent_System.Ennum
+﻿namespace Car_Rent_System.Enum
 {
    
     public enum UserRole

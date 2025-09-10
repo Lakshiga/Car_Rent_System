@@ -19,7 +19,7 @@ namespace Car_Rent_System.Models
         [Required(ErrorMessage = "Car model is required")]
         [StringLength(50, ErrorMessage = "Car model cannot exceed 50 characters")]
         [Display(Name = "Model Year")]
-        public string CarModel { get; set; }`
+        public string CarModel { get; set; }
 
         [StringLength(200)]
         [Display(Name = "Image URL")]

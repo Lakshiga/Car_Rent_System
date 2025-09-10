@@ -1,6 +1,7 @@
 ﻿using Car_Rent_System.Models; 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Car_Rent_System.DATA;
 using Microsoft.EntityFrameworkCore;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
@@ -11,11 +12,11 @@ namespace Car_Rent_System.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly CynexBlazerContext _context;
+        private readonly ApplicationDbContext _context;
 
         private readonly Cloudinary _cloudinary;
 
-        public AdminController(CynexBlazerContext context, Cloudinary cloudinary)
+        public AdminController(ApplicationDbContext context, Cloudinary cloudinary)
         {
             _context = context;
             _cloudinary = cloudinary;
