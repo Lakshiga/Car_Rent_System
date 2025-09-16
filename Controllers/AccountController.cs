@@ -1,228 +1,399 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
-using Car_Rent_System.Models;
-using Car_Rent_System.Services;  
-using Microsoft.Extensions.Configuration;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text;
 using System.Threading.Tasks;
+using Car_Rent_System.Data;
+using Car_Rent_System.DTOs;
+using Car_Rent_System.Enums;
+using Car_Rent_System.Interfaces;
+using Car_Rent_System.Mappers;
+using Car_Rent_System.Models;
+using Car_Rent_System.Repositories;
+using Car_Rent_System.Services;
+using Car_Rent_System.Services.Interfaces;
+using Car_Rent_System.ViewModels.Account;
+using CloudinaryDotNet;
+using dotenv.net;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Car_Rent_System.Controllers
 {
-  
     [ApiController]
     [Route("api/[controller]")]
     public class AccountApiController : ControllerBase
     {
-        private readonly CynexBlazerContext _context;
-        private readonly IConfiguration _config;
+        private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
 
-        public AccountApiController(CynexBlazerContext context, IConfiguration config)
+        public AccountApiController(IUserService userService, IJwtService jwtService)
         {
-            _context = context;
-            _config = config;
+            _userService = userService;
+            _jwtService = jwtService;
         }
-
-        
 
         [HttpPost("login")]
-        public async Task<IActionResult> ApiLogin([FromBody] LoginRequest request)
+        public async Task<IActionResult> ApiLogin([FromBody] LoginDto request)
         {
-            if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
-                return BadRequest(new { error = "Please enter both username and password." });
-
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Username == request.Username && u.Password == request.Password && u.IsActive);
-
-            if (user != null)
+            try
             {
-                var token = JwtTokenHelper.GenerateJwtToken(user, _config);
-                return Ok(new { message = "Login successful", token, role = user.Role, username = user.Username });
+                if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+                    return BadRequest(new { error = "Email and password required." });
+
+                var user = await _userService.AuthenticateAsync(request.Email, request.Password)
+                    ?? await _userService.AuthenticateByUsernameAsync(request.Email, request.Password);
+
+                if (user == null)
+                    return Unauthorized(new { error = "Invalid credentials." });
+
+                if (user.VerificationStatus != VerificationStatus.Approved)
+                    return Unauthorized(new { error = "Account not approved by admin." });
+
+                var token = _jwtService.GenJwtToken(user);
+                if (string.IsNullOrWhiteSpace((string?)token))
+                    return StatusCode(500, new { error = "Failed to generate token." });
+
+                return Ok(new
+                {
+                    message = "Login successful",
+                    token,
+                    role = user.Role.ToString(),
+                    username = user.Email,
+                    fullName = user.FullName
+                });
             }
-
-            return Unauthorized(new { error = "Invalid username or password." });
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = $"Server error: {ex.Message}", detail = ex.ToString() });
+            }
         }
-
-
     }
-
 
     [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
-        private readonly CynexBlazerContext _context;
-        private readonly IConfiguration _config;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
 
-        public AccountController(CynexBlazerContext context, IConfiguration config)
+        public AccountController(
+            SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            IUserService userService,
+            IEmailService emailService)
         {
-            _context = context;
-            _config = config;
+            _signInManager = signInManager;
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _userService = userService;
+            _emailService = emailService;
         }
 
         [HttpGet]
         public IActionResult Login()
         {
-            return View();
+            try
+            {
+                var userId = HttpContext.Session.GetString("UserId");
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    var user = _userService.GetUserByIdAsync(userId).Result;
+                    if (user != null)
+                    {
+                        var userRoles = _userManager.GetRolesAsync(user).Result;
+                        var userRole = userRoles.FirstOrDefault();
+
+                        if (!string.IsNullOrEmpty(userRole) && Enum.TryParse<Car_Rent_System.Enums.Role>(userRole, true, out var parsedRole))
+                        {
+                            return RedirectToAction("Dashboard", GetDashboardController(parsedRole));
+                        }
+                        // Fallback to Customer if role is not valid
+                        return RedirectToAction("Dashboard", GetDashboardController(Car_Rent_System.Enums.Role.Customer));
+                    }
+                }
+
+                return View(new LoginViewModel());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Login GET error: {ex.Message}");
+                return View(new LoginViewModel());
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            try
             {
-                ViewBag.Error = "Please enter both username and password.";
-                return View();
-            }
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Username == username && u.Password == password && u.IsActive);
+                // Use service layer for login
+                var (success, message, user) = await _userService.LoginUserAsync(model.EmailOrUsername, model.Password, model.RememberMe);
 
-            if (user != null)
-            {
-                var token = JwtTokenHelper.GenerateJwtToken(user, _config);
+                if (!success)
+                {
+                    TempData["Error"] = message;
+                    return View(model);
+                }
 
-                HttpContext.Session.SetInt32("UserID", user.UserID);
-                HttpContext.Session.SetString("Username", user.Username);
-                HttpContext.Session.SetString("Role", user.Role);
-                HttpContext.Session.SetString("FullName", user.FullName ?? user.Username);
-                HttpContext.Session.SetString("Token", token);
+                // Sign in user
+                await _signInManager.SignInAsync(user, isPersistent: model.RememberMe);
 
-                TempData["Success"] = "Login successful!";
+                // Set session data
+                HttpContext.Session.SetString("UserId", user.Id ?? "");
+                HttpContext.Session.SetString("Username", user.UserName ?? "");
+                HttpContext.Session.SetString("Email", user.Email ?? "");
+                HttpContext.Session.SetString("Role", (user.Role != null ? user.Role : Car_Rent_System.Enums.Role.Customer).ToString());
+                HttpContext.Session.SetString("FullName", user.FullName ?? "");
+                HttpContext.Session.SetString("ImageUrl", user.ImageUrl ?? "");
 
-                if (user.Role == "Admin")
+                TempData["Success"] = $"Welcome back, {user.FullName}!";
+
+                // Redirect based on role
+                if (user.Role == Car_Rent_System.Enums.Role.Admin || user.Role == Car_Rent_System.Enums.Role.SubAdmin || user.Role == Car_Rent_System.Enums.Role.Staff)
                 {
                     return RedirectToAction("Dashboard", "Admin");
                 }
-                else if (user.Role == "Customer")
+                else if (user.Role == Car_Rent_System.Enums.Role.Customer)
                 {
                     return RedirectToAction("Dashboard", "Customer");
                 }
-                else if (user.Role == "Staff")
+                else if (user.Role == Car_Rent_System.Enums.Role.Driver)
                 {
-                    return RedirectToAction("Dashboard", "Staff");
+                    return RedirectToAction("Dashboard", "Driver");
                 }
-
-                return RedirectToAction("Index", "Home");
+                else if (user.Role == Car_Rent_System.Enums.Role.VehicleOwner)
+                {
+                    return RedirectToAction("Dashboard", "VehicleOwner");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home");
+                }
             }
-
-            ViewBag.Error = "Invalid username or password.";
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> LoginSessionSet([FromBody] LoginRequest request)
-        {
-            if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
-                return BadRequest();
-
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Username == request.Username && u.Password == request.Password && u.IsActive);
-
-            if (user != null)
+            catch (Exception ex)
             {
-                HttpContext.Session.SetInt32("UserID", user.UserID);
-                HttpContext.Session.SetString("Username", user.Username);
-                HttpContext.Session.SetString("Role", user.Role);
-                HttpContext.Session.SetString("FullName", user.FullName ?? user.Username);
-                return Ok(new { message = "Session set" });
+                Console.WriteLine($"❌ Login POST error: {ex.Message}");
+                ModelState.AddModelError(string.Empty, "An error occurred during login. Please try again.");
+                return View(model);
             }
-
-            return Unauthorized();
         }
-
-
 
         [HttpGet]
         public IActionResult Register()
         {
-            return View();
+            return View(new RegisterViewModel());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(User user)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var existingUser = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Username == user.Username);
-
-                if (existingUser != null)
+                if (!model.AgreeTerms)
                 {
-                    ViewBag.Error = "Username already exists. Please choose a different username.";
-                    return View(user);
+                    ModelState.AddModelError("AgreeTerms", "You must agree to the Terms of Service and Privacy Policy.");
                 }
 
-                var existingEmail = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Email == user.Email);
-
-                if (existingEmail != null)
+                if (!ModelState.IsValid)
                 {
-                    ViewBag.Error = "Email already registered. Please use a different email.";
-                    return View(user);
+                    return View(model);
                 }
 
-                user.Role = "Customer"; 
-                user.DateJoined = System.DateTime.Now;
-                user.IsActive = true;
+                // Use service layer for registration
+                var (success, message, user) = await _userService.RegisterUserAsync(model);
 
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
+                if (!success)
+                {
+                    ModelState.AddModelError(string.Empty, message);
+                    return View(model);
+                }
 
-                TempData["Success"] = "Registration successful! Please login with your credentials.";
-                return RedirectToAction("Login");
+                // Handle successful registration
+                if (user.VerificationStatus == VerificationStatus.Approved)
+                {
+                    // Auto-login for customers
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+
+                    HttpContext.Session.SetString("UserId", user.Id);
+                    HttpContext.Session.SetString("Username", user.UserName);
+                    HttpContext.Session.SetString("Email", user.Email);
+                    HttpContext.Session.SetString("Role", user.Role.ToString());
+                    HttpContext.Session.SetString("FullName", user.FullName);
+                    HttpContext.Session.SetString("ImageUrl", user.ImageUrl ?? "");
+
+                    TempData["Success"] = $"Welcome to CYNEX BLAZER, {user.FullName}!";
+                    return RedirectToAction("Dashboard", "Customer");
+                }
+                else
+                {
+                    // Send email confirmation for driver/owner
+                    try
+                    {
+                        var token = await _userService.GenerateEmailConfirmationTokenAsync(user);
+                        var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, token }, Request.Scheme);
+
+                        await _emailService.SendEmailAsync(user.Email, "Confirm Your CYNEX BLAZER Account",
+                            $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.<br/>" +
+                            $"Your {model.RequestedRole} application will be reviewed by admin shortly.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"⚠️ Email failed: {ex.Message}");
+                        TempData["Warning"] = "Registration succeeded, but email failed. Contact support.";
+                    }
+
+                    TempData["Success"] = "Registration successful! Please wait for admin approval.";
+                    return RedirectToAction("Login");
+                }
             }
-
-            return View(user);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Registration error: {ex.Message}");
+                ModelState.AddModelError(string.Empty, "An error occurred during registration. Please try again.");
+                return View(model);
+            }
         }
 
-        public IActionResult Logout()
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
-            HttpContext.Session.Clear();
-            return RedirectToAction("Index", "Home");
+            try
+            {
+                if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+                {
+                    return RedirectToAction("Login");
+                }
+
+                var success = await _userService.ConfirmEmailAsync(userId, token);
+                if (success)
+                {
+                    ViewBag.Message = "Thank you for confirming your email. Please wait for admin approval.";
+                    return View("Info");
+                }
+
+                ViewBag.Error = "Email confirmation failed.";
+                return View("Info");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ ConfirmEmail error: {ex.Message}");
+                ViewBag.Error = "An error occurred during email confirmation.";
+                return View("Info");
+            }
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                await _userService.SignOutAsync();
+                HttpContext.Session.Clear();
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Logout error: {ex.Message}");
+                HttpContext.Session.Clear();
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
-            var userId = HttpContext.Session.GetInt32("UserID");
-            if (userId == null)
-                return RedirectToAction("Login");
+            try
+            {
+                var userId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return RedirectToAction("Login");
+                }
 
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-                return RedirectToAction("Login");
+                var model = await _userService.GetUserProfileAsync(userId);
+                if (model == null)
+                {
+                    return RedirectToAction("Login");
+                }
 
-            return View(user);
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Profile GET error: {ex.Message}");
+                return RedirectToAction("Login");
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Profile(User user)
+        public async Task<IActionResult> Profile(ProfileDto model, IFormFile? ImageFile)
         {
-            var userId = HttpContext.Session.GetInt32("UserID");
-            if (userId == null)
-                return RedirectToAction("Login");
-
-            if (ModelState.IsValid)
+            try
             {
-                var existingUser = await _context.Users.FindAsync(userId);
-                if (existingUser != null)
+                var userId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userId))
                 {
-                    existingUser.FullName = user.FullName;
-                    existingUser.Email = user.Email;
-                    existingUser.PhoneNumber = user.PhoneNumber;
-
-                    await _context.SaveChangesAsync();
-                    ViewBag.Success = "Profile updated successfully!";
+                    return RedirectToAction("Login");
                 }
+
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
+
+                // Use service layer for profile update
+                var (success, message) = await _userService.UpdateUserProfileAsync(userId, model, ImageFile);
+
+                if (success)
+                {
+                    // Update session data
+                    HttpContext.Session.SetString("FullName", model.FullName);
+                    HttpContext.Session.SetString("ImageUrl", model.ImageUrl ?? "");
+
+                    TempData["Success"] = message;
+                    return RedirectToAction("Profile");
+                }
+
+                ModelState.AddModelError(string.Empty, message);
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Profile POST error: {ex.Message}");
+                ModelState.AddModelError(string.Empty, "An error occurred while updating your profile. Please try again.");
+                return View(model);
+            }
+        }
+
+        private string GetDashboardController(Role? role = null)
+        {
+            var sessionRole = HttpContext.Session.GetString("Role");
+            if (role == null && !string.IsNullOrEmpty(sessionRole) && Enum.TryParse<Role>(sessionRole, true, out var parsed))
+            {
+                role = parsed;
             }
 
-            return View(user);
-        }
-    }
+            role ??= Car_Rent_System.Enums.Role.Customer;
 
-    // DTO for API login request
-    public class LoginRequest
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
+            return role switch
+            {
+                Car_Rent_System.Enums.Role.Admin or Car_Rent_System.Enums.Role.SubAdmin or Car_Rent_System.Enums.Role.Staff => "Admin",
+                Car_Rent_System.Enums.Role.Customer => "Customer",
+                Car_Rent_System.Enums.Role.Driver => "Driver",
+                Car_Rent_System.Enums.Role.VehicleOwner => "VehicleOwner",
+                _ => "Home"
+            };
+        }
     }
 }

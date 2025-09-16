@@ -8,7 +8,7 @@
 <section class="hero-section">
     <div class="container hero-content">
         <div class="row align-items-center min-vh-100">
-            <div class="col-lg-6 ">
+            <div class="col-lg-6">
                 <h1 class="hero-title">
                     LUXURY<br>
                     <span class="text-cynex-blue">REDEFINED</span>
@@ -26,7 +26,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col-lg-6 text-center ">
+            <div class="col-lg-6 text-center">
                 <div class="position-relative">
                     <img src="~/images/Cynex Blazer.png" alt="CYNEX BLAZER" class="img-fluid" style="max-height: 400px; filter: drop-shadow(0 0 50px rgba(10, 36, 114, 0.8));">
                     <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle, transparent 40%, rgba(10, 36, 114, 0.1) 70%);"></div>
@@ -36,32 +36,30 @@
     </div>
 </section>
 
-<!-- Statistics Section <div class="col-lg-3 col-md-6">
-    <div class="cynex-card p-4 text-center h-100">
--->
+<!-- Statistics Section -->
 <section class="py-5" style="background: rgba(0, 0, 0, 0.9);">
     <div class="container">
         <div class="row g-4">
             <div class="col-lg-3 col-md-6">
-                <div class="stats-card ">
+                <div class="stats-card">
                     <div class="stats-number">@ViewBag.TotalCars</div>
                     <div class="stats-label">Premium Vehicles</div>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="stats-card ">
+                <div class="stats-card">
                     <div class="stats-number">@ViewBag.AvailableCars</div>
                     <div class="stats-label">Ready to Drive</div>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="stats-card ">
+                <div class="stats-card">
                     <div class="stats-number">@ViewBag.TotalBookings</div>
                     <div class="stats-label">Elite Clients</div>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="stats-card ">
+                <div class="stats-card">
                     <div class="stats-number">24/7</div>
                     <div class="stats-label">Concierge Service</div>
                 </div>
@@ -82,90 +80,105 @@
         </div>
 
         <div class="row g-4">
-            @foreach (var car in Model)
+            @if (Model != null && Model.Any())
             {
-                <div class="col-lg-4 col-md-6">
-                    <div class="car-card cynex-card ">
-                        <div class="position-relative overflow-hidden">
-                            @* <img src="@(string.IsNullOrEmpty(car.ImageUrl)
-                                                     ? Url.Content("~/images/BMW.jpg")
-                                                     : Url.Content(car.ImageUrl.StartsWith("~/images/Lambogini.jpg") ? car.ImageUrl : "~/images/Mercedes.jpg" + car.ImageUrl))"
-                             class="car-image" alt="@car.CarName"> *@
-                            <img src="~/images/blue-lamborghini.jpg" class="car-image" alt="BMW M5 Competition">
-                            <div class="position-absolute top-0 end-0 m-3">
-                                @if (car.IsAvailable)
+                @foreach (var car in Model)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="car-card cynex-card">
+                            <div class="position-relative">
+                                @if (!string.IsNullOrEmpty(car.ImageUrl))
                                 {
-                                    <span class="badge bg-success fs-6">
-                                        <i class="fas fa-check-circle"></i> AVAILABLE
-                                    </span>
+                                    <img src="@Url.Content(car.ImageUrl)" class="car-image" alt="@car.CarName">
                                 }
                                 else
                                 {
-                                    <span class="badge bg-danger fs-6">
-                                        <i class="fas fa-lock"></i> RESERVED
-                                    </span>
+                                    <img src="~/images/blue-lamborghini.jpg" class="car-image" alt="@car.CarName">
+                                }
+                                <div class="position-absolute top-0 end-0 m-3">
+                                    @if (car.IsAvailable)
+                                    {
+                                        <span class="badge bg-success fs-6">
+                                            <i class="fas fa-check-circle"></i> AVAILABLE
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger fs-6">
+                                            <i class="fas fa-lock"></i> RESERVED
+                                        </span>
+                                    }
+                                </div>
+                                <div class="position-absolute bottom-0 start-0 m-3">
+                                    <span class="price-tag">$@car.DailyRate<small>/day</small></span>
+                                </div>
+                            </div>
+
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title cynex-font text-cynex-silver mb-0">@car.CarName</h5>
+                                    <small class="text-cynex-blue fw-bold">@car.CarModel</small>
+                                </div>
+
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6">
+                                        <small class="text-muted">
+                                            <i class="fas fa-tag text-cynex-blue"></i> @car.CarType
+                                        </small>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">
+                                            <i class="fas fa-gas-pump text-cynex-blue"></i> @car.FuelType
+                                        </small>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">
+                                            <i class="fas fa-users text-cynex-blue"></i> @car.SeatingCapacity Seats
+                                        </small>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">
+                                            <i class="fas fa-cogs text-cynex-blue"></i> @car.Transmission
+                                        </small>
+                                    </div>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(car.Description))
+                                {
+                                    <p class="card-text text-muted mb-4">@car.Description</p>
+                                }
+
+                                @if (car.IsAvailable)
+                                {
+                                    <div class="d-grid">
+                                        <a asp-controller="Customer" asp-action="BookCar" asp-route-id="@car.Id"
+                                           class="btn btn-cynex-primary">
+                                            <i class="fas fa-fire"></i> RESERVE NOW
+                                        </a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="d-grid">
+                                        <button class="btn btn-outline-secondary" disabled>
+                                            <i class="fas fa-lock"></i> CURRENTLY RESERVED
+                                        </button>
+                                    </div>
                                 }
                             </div>
-                            <div class="position-absolute bottom-0 start-0 m-3">
-                                <span class="price-tag">$@car.DailyRate<small>/day</small></span>
-                            </div>
-                        </div>
-
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <h5 class="card-title cynex-font text-cynex-silver mb-0">@car.CarName</h5>
-                                <small class="text-cynex-blue fw-bold">@car.CarModel</small>
-                            </div>
-
-                            <div class="row g-2 mb-3">
-                                <div class="col-6">
-                                    <small class="text-muted">
-                                        <i class="fas fa-tag text-cynex-blue"></i> @car.CarType
-                                    </small>
-                                </div>
-                                <div class="col-6">
-                                    <small class="text-muted">
-                                        <i class="fas fa-gas-pump text-cynex-blue"></i> @car.FuelType
-                                    </small>
-                                </div>
-                                <div class="col-6">
-                                    <small class="text-muted">
-                                        <i class="fas fa-users text-cynex-blue"></i> @car.SeatingCapacity Seats
-                                    </small>
-                                </div>
-                                <div class="col-6">
-                                    <small class="text-muted">
-                                        <i class="fas fa-cogs text-cynex-blue"></i> @car.Transmission
-                                    </small>
-                                </div>
-                            </div>
-
-                            @if (!string.IsNullOrEmpty(car.Description))
-                            {
-                                <p class="card-text text-muted mb-4">@car.Description</p>
-                            }
-
-                            @if (car.IsAvailable)
-                            {
-                                <div class="d-grid">
-                                    <a asp-controller="Customer" asp-action="BookCar" asp-route-id="@car.CarID"
-                                       class="btn btn-cynex-primary">
-                                        <i class="fas fa-fire"></i> RESERVE NOW
-                                    </a>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="d-grid">
-                                    <button class="btn btn-outline-secondary" disabled>
-                                        <i class="fas fa-lock"></i> CURRENTLY RESERVED
-                                    </button>
-                                </div>
-                            }
                         </div>
                     </div>
-                </div>
+                }
             }
+            else
+            {
+                <div class="col-12">
+                    <div class="text-center p-5">
+                        <h3 class="text-cynex-silver">No vehicles available at this time</h3>
+                        <p class="text-muted">Please check back later or contact our support team.</p>
+                    </div>
+                </div>
+            }   
         </div>
 
         <div class="text-center mt-5">
@@ -188,7 +201,7 @@
 
         <div class="row g-4">
             <div class="col-lg-3 col-md-6">
-                <div class="stats-card cynex-card p-4 text-center h-100 ">
+                <div class="stats-card cynex-card p-4 text-center h-100">
                     <div class="mb-4">
                         <i class="fas fa-shield-alt fa-4x text-cynex-blue"></i>
                     </div>
@@ -197,7 +210,7 @@
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="stats-card cynex-card p-4 text-center h-100 " style="animation-delay: 0.2s;">
+                <div class="stats-card cynex-card p-4 text-center h-100" style="animation-delay: 0.2s;">
                     <div class="mb-4">
                         <i class="fas fa-concierge-bell fa-4x text-cynex-blue"></i>
                     </div>
@@ -206,7 +219,7 @@
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="stats-card cynex-card p-4 text-center h-100 " style="animation-delay: 0.4s;">
+                <div class="stats-card cynex-card p-4 text-center h-100" style="animation-delay: 0.4s;">
                     <div class="mb-4">
                         <i class="fas fa-crown fa-4x text-cynex-blue"></i>
                     </div>
@@ -215,7 +228,7 @@
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
-                <div class="stats-card cynex-card p-4 text-center h-100 " style="animation-delay: 0.6s;">
+                <div class="stats-card cynex-card p-4 text-center h-100" style="animation-delay: 0.6s;">
                     <div class="mb-4">
                         <i class="fas fa-map-marked-alt fa-4x text-cynex-blue"></i>
                     </div>
@@ -322,8 +335,7 @@
 
 @section Scripts {
     <script>
-        // Enhanced animations on scroll
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function() {
             // Intersection Observer for animations
             const observerOptions = {
                 threshold: 0.1,
@@ -344,34 +356,42 @@
             });
 
             // Counter animation for stats
-            $('.stats-number').each(function() {
-                const $this = $(this);
-                const countTo = $this.text();
+            document.querySelectorAll('.stats-number').forEach(function(element) {
+                const countTo = element.textContent;
 
-                if (!isNaN(countTo)) {
-                    $({ countNum: 0 }).animate({
-                        countNum: countTo
-                    }, {
-                        duration: 2000,
-                        easing: 'swing',
-                        step: function() {
-                            $this.text(Math.floor(this.countNum));
-                        },
-                        complete: function() {
-                            $this.text(countTo);
+                if (!isNaN(countTo) && countTo !== '24/7') {
+                    const duration = 2000;
+                    const start = 0;
+                    const end = parseInt(countTo);
+                    const increment = (end - start) / (duration / 16); // 16ms for 60fps
+
+                    let current = start;
+                    const timer = setInterval(function() {
+                        current += increment;
+                        if (current >= end) {
+                            clearInterval(timer);
+                            element.textContent = end;
+                        } else {
+                            element.textContent = Math.floor(current);
                         }
-                    });
+                    }, 16);
                 }
             });
 
-            // Parallax effect for hero section
-            $(window).scroll(function() {
-                const scrolled = $(window).scrollTop();
-                const parallax = $('.hero-section');
-                const speed = scrolled * 0.5;
-
-                parallax.css('transform', 'translateY(' + speed + 'px)');
-            });
+            // Remove the problematic parallax effect that was causing scrolling issues
+            // Instead, add a subtle animation to the hero section
+            const heroSection = document.querySelector('.hero-section');
+            if (heroSection) {
+                window.addEventListener('scroll', function() {
+                    const scrollPosition = window.scrollY;
+                    // Just add a subtle opacity effect instead of transform
+                    if (scrollPosition > 100) {
+                        heroSection.style.opacity = '0.95';
+                    } else {
+                        heroSection.style.opacity = '1';
+                    }
+                });
+            }
         });
     </script>
 }

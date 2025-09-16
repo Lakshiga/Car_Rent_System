@@ -1,197 +1,434 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
+using Car_Rent_System.DTOs;
+using Car_Rent_System.Enums;
+using Car_Rent_System.Interfaces;
 using Car_Rent_System.Models;
+using Car_Rent_System.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.IO;
+using Stripe; 
+using Newtonsoft.Json;
+using Stripe.BillingPortal;
+using BookingViewModel = Car_Rent_System.ViewModels.Booking.BookingViewModel;
+using CustomerBookingViewModel = Car_Rent_System.ViewModels.Customer.BookingViewModel;
+using DashboardViewModel = Car_Rent_System.ViewModels.Customer.DashboardViewModel;
 
 namespace Car_Rent_System.Controllers
 {
     public class CustomerController : Controller
     {
-        private readonly CynexBlazerContext _context;
+        private readonly ICustomerService _customerService;
+        private readonly IStripeService _stripeService;
 
-        public CustomerController(CynexBlazerContext context)
+        public CustomerController(
+            ICustomerService customerService,
+            IStripeService stripeService)
         {
-            _context = context;
+            _customerService = customerService;
+            _stripeService = stripeService;
         }
 
-        private bool IsCustomer()
+        private async Task<bool> IsCustomer()
         {
-            return HttpContext.Session.GetString("Role") == "Customer";
+            try
+            {
+                var userId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userId)) return false;
+
+                var user = await _customerService.GetCustomerProfileAsync(userId);
+                return user != null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ IsCustomer error: {ex.Message}");
+                return false;
+            }
         }
 
-        private int? GetCustomerId()
+        private string GetCustomerId()
         {
-            return HttpContext.Session.GetInt32("UserID");
+            return HttpContext.Session.GetString("UserId") ?? string.Empty;
         }
 
         public async Task<IActionResult> Dashboard()
         {
-            if (!IsCustomer())
+            try
+            {
+                if (!await IsCustomer())
+                    return RedirectToAction("Login", "Account");
+
+                var customerId = GetCustomerId();
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    TempData["Error"] = "Customer session not found.";
+                    return RedirectToAction("Login", "Account");
+                }
+
+                var dashboardData = await _customerService.GetCustomerDashboardAsync(customerId);
+                return View(dashboardData.RecentBookings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Dashboard error: {ex.Message}");
+                TempData["Error"] = "An error occurred while loading the dashboard.";
                 return RedirectToAction("Login", "Account");
-
-            var customerId = GetCustomerId();
-
-            ViewBag.TotalBookings = await _context.Bookings.CountAsync(b => b.CustomerID == customerId);
-            ViewBag.TotalSpent = await _context.Bookings
-                .Where(b => b.CustomerID == customerId)
-                .SumAsync(b => b.TotalCost);
-
-            var recentBookings = await _context.Bookings
-                .Include(b => b.Car)
-                .Where(b => b.CustomerID == customerId)
-                .OrderByDescending(b => b.BookingDate)
-                .Take(5)
-                .ToListAsync();
-
-            return View(recentBookings);
+            }
         }
 
         public async Task<IActionResult> BrowseCars(string searchTerm, string carType, string fuelType, decimal? maxPrice)
         {
-            var query = _context.Cars.Where(c => c.IsAvailable);
+            try
+            {
+                if (!await IsCustomer())
+                    return RedirectToAction("Login", "Account");
 
-            if (!string.IsNullOrEmpty(searchTerm))
-                query = query.Where(c => c.CarName.Contains(searchTerm) || c.CarModel.Contains(searchTerm));
+                var cars = await _customerService.SearchCarsAsync(searchTerm, carType, fuelType, maxPrice);
+                ViewBag.CarTypes = await _customerService.GetDistinctCarTypesAsync();
+                ViewBag.FuelTypes = await _customerService.GetDistinctFuelTypesAsync();
 
-            if (!string.IsNullOrEmpty(carType))
-                query = query.Where(c => c.CarType == carType);
-
-            if (!string.IsNullOrEmpty(fuelType))
-                query = query.Where(c => c.FuelType == fuelType);
-
-            if (maxPrice.HasValue)
-                query = query.Where(c => c.DailyRate <= maxPrice.Value);
-
-            var cars = await query.OrderBy(c => c.DailyRate).ToListAsync();
-
-            ViewBag.CarTypes = await _context.Cars.Select(c => c.CarType).Distinct().ToListAsync();
-            ViewBag.FuelTypes = await _context.Cars.Select(c => c.FuelType).Distinct().ToListAsync();
-
-            return View(cars);
+                return View(cars);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ BrowseCars error: {ex.Message}");
+                TempData["Error"] = "An error occurred while browsing cars.";
+                return RedirectToAction("Dashboard");
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> BookCar(int id)
         {
-            if (!IsCustomer())
-                return RedirectToAction("Login", "Account");
-
-            var car = await _context.Cars.FindAsync(id);
-            if (car == null || !car.IsAvailable)
+            try
             {
-                TempData["Error"] = "Car is not available.";
+                if (!await IsCustomer())
+                    return RedirectToAction("Login", "Account");
+
+                var car = await _customerService.GetCarByIdAsync(id);
+                if (car == null || !car.IsAvailable)
+                {
+                    TempData["Error"] = "Car is not available for booking.";
+                    return RedirectToAction("BrowseCars");
+                }
+
+                ViewBag.Car = car;
+                return View(new BookingViewModel { VehicleId = id });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ BookCar GET error: {ex.Message}");
+                TempData["Error"] = "An error occurred while loading the booking page.";
                 return RedirectToAction("BrowseCars");
             }
-
-            ViewBag.Car = car;
-            return View(new Booking { CarID = id });
         }
 
         [HttpPost]
-        public async Task<IActionResult> BookCar(Booking booking)
+        public async Task<IActionResult> BookCar(BookingViewModel bookingViewModel, IFormFile licenseFrontFile, IFormFile licenseBackFile)
         {
-            if (!IsCustomer())
-                return RedirectToAction("Login", "Account");
-
-            var customerId = GetCustomerId();
-            if (customerId == null)
-                return RedirectToAction("Login", "Account");
-
-            var car = await _context.Cars.FindAsync(booking.CarID);
-
-            if (booking.PickupDate < DateTime.Today)
-                ModelState.AddModelError("PickupDate", "Pickup date cannot be in the past.");
-
-            if (booking.ReturnDate <= booking.PickupDate)
-                ModelState.AddModelError("ReturnDate", "Return date must be after pickup date.");
-
-            if (car == null || !car.IsAvailable)
-                ModelState.AddModelError("", "Car is not available for booking.");
-
-            if (ModelState.IsValid)
+            try
             {
-                // Check for conflicting bookings
-                var hasConflict = await _context.Bookings.AnyAsync(b =>
-                    b.CarID == booking.CarID &&
-                    b.BookingStatus == "Confirmed" &&
-                    (
-                        (booking.PickupDate >= b.PickupDate && booking.PickupDate <= b.ReturnDate) ||
-                        (booking.ReturnDate >= b.PickupDate && booking.ReturnDate <= b.ReturnDate) ||
-                        (booking.PickupDate <= b.PickupDate && booking.ReturnDate >= b.ReturnDate)
-                    ));
+                if (!await IsCustomer())
+                    return RedirectToAction("Login", "Account");
 
-                if (hasConflict)
+                var customerId = GetCustomerId();
+                if (string.IsNullOrEmpty(customerId))
                 {
-                    ModelState.AddModelError("", "Car is already booked for the selected dates.");
-                    ViewBag.Car = car;
-                    return View(booking);
+                    TempData["Error"] = "Customer session not found.";
+                    return RedirectToAction("Login", "Account");
                 }
 
-                booking.CustomerID = customerId.Value;
-                booking.BookingDate = DateTime.Now;
-                booking.BookingStatus = "Confirmed";
+                var car = await _customerService.GetCarByIdAsync(bookingViewModel.VehicleId);
+                if (car == null || !car.IsAvailable)
+                {
+                    ModelState.AddModelError("", "Car is no longer available.");
+                    ViewBag.Car = car;
+                    return View(bookingViewModel);
+                }
 
-                var totalDays = (booking.ReturnDate - booking.PickupDate).Days + 1;
-                booking.TotalCost = car.DailyRate * totalDays;
+                // Validate dates
+                if (bookingViewModel.PickupDate < DateTime.Today)
+                    ModelState.AddModelError("PickupDate", "Pickup date cannot be in the past.");
 
-                _context.Bookings.Add(booking);
-                car.IsAvailable = false;
-                _context.Cars.Update(car);
+                if (bookingViewModel.ReturnDate <= bookingViewModel.PickupDate)
+                    ModelState.AddModelError("ReturnDate", "Return date must be after pickup date.");
 
-                await _context.SaveChangesAsync();
+                // Validate file uploads
+                if (licenseFrontFile == null || licenseFrontFile.Length == 0)
+                {
+                    ModelState.AddModelError("", "License front image is required.");
+                }
 
-                TempData["Success"] = "Car booked successfully!";
-                return RedirectToAction("BookingHistory");
+                if (licenseBackFile == null || licenseBackFile.Length == 0)
+                {
+                    ModelState.AddModelError("", "License back image is required.");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    // Check for booking conflicts
+                    var hasConflict = await _customerService.HasBookingConflictAsync(bookingViewModel.VehicleId, bookingViewModel.PickupDate, bookingViewModel.ReturnDate);
+                    if (hasConflict)
+                    {
+                        ModelState.AddModelError("", "Car is already booked for the selected dates.");
+                        ViewBag.Car = car;
+                        return View(bookingViewModel);
+                    }
+
+                    // Calculate total cost using the new method
+                    var totalCost = await _customerService.CalculateBookingCostAsync(bookingViewModel);
+                    if (totalCost <= 0)
+                    {
+                        ModelState.AddModelError("", "Unable to calculate booking cost. Please check your inputs.");
+                        ViewBag.Car = car;
+                        return View(bookingViewModel);
+                    }
+
+                    // Store booking data in TempData for payment processing
+                    TempData["BookingViewModel"] = Newtonsoft.Json.JsonConvert.SerializeObject(bookingViewModel);
+                    TempData["LicenseFrontFile"] = licenseFrontFile?.FileName;
+                    TempData["LicenseBackFile"] = licenseBackFile?.FileName;
+                    
+                    // For now, redirect to payment success (in real implementation, this would be payment processing)
+                    return RedirectToAction("PaymentSuccess", "Payment", new { bookingId = 1 });
+                }
+
+                ViewBag.Car = car;
+                return View(bookingViewModel);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ BookCar POST error: {ex.Message}");
+                TempData["Error"] = "An error occurred while processing the booking.";
+                return RedirectToAction("BrowseCars");
+            }
+        }
 
-            ViewBag.Car = car;
-            return View(booking);
+
+        public async Task<IActionResult> Checkout(string sessionId)
+        {
+            try
+            {
+                if (!await IsCustomer())
+                    return RedirectToAction("Login", "Account");
+
+                if (string.IsNullOrEmpty(sessionId))
+                {
+                    TempData["Error"] = "Invalid checkout session.";
+                    return RedirectToAction("BrowseCars");
+                }
+
+                ViewBag.SessionId = sessionId;
+                ViewBag.StripePublishableKey = "pk_test_51...";
+                return View();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Checkout error: {ex.Message}");
+                TempData["Error"] = "An error occurred while loading checkout.";
+                return RedirectToAction("BrowseCars");
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> Webhook()
+        {
+            try
+            {
+                var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+
+                // ✅ Now this correctly uses Stripe.EventUtility
+                var stripeEvent = EventUtility.ConstructEvent(
+                    json,
+                    Request.Headers["Stripe-Signature"],
+                    "whsec_your_webhook_secret_here" // 👉 Replace with your actual webhook secret from Stripe Dashboard
+                );
+
+                // ✅ Now this correctly uses Stripe.Events
+                if (stripeEvent.Type == "checkout.session.completed")
+                {
+                    var session = stripeEvent.Data.Object as Session;
+                    var bookingInfo = TempData["BookingInfo"]?.ToString();
+                    var carId = TempData["CarID"]?.ToString();
+
+                    if (!string.IsNullOrEmpty(bookingInfo) && !string.IsNullOrEmpty(carId))
+                    {
+                        var bookingDto = JsonConvert.DeserializeObject<BookingDto>(bookingInfo);
+                        if (bookingDto == null) return BadRequest("Invalid booking data");
+
+                        // ✅ Map DTO → ViewModel
+                        var bookingViewModel = new BookingViewModel
+                        {
+                            VehicleId = bookingDto.CarID,
+                            PickupDate = bookingDto.PickupDate,
+                            ReturnDate = bookingDto.ReturnDate,
+                            TotalAmount = bookingDto.TotalCost,
+                            Status = bookingDto.BookingStatus.ToString(),
+                            PickupLocation = bookingDto.PickupLocation,
+                            ReturnLocation = bookingDto.ReturnLocation,
+                            SpecialRequirements = bookingDto.SpecialRequirements,
+                            WithDriver = bookingDto.WithDriver
+                        };
+
+                        // ✅ Get userId
+                        var userId = GetCustomerId();
+
+                        // ✅ Call service with userId
+                        var success = await _customerService.CreateBookingAsync(bookingViewModel, userId);
+
+                        if (success)
+                        {
+                            TempData["Success"] = "Payment successful! Your booking is confirmed.";
+                        }
+                        else
+                        {
+                            return BadRequest("Failed to create booking.");
+                        }
+                    }
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Webhook error: {ex.Message}");
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         public async Task<IActionResult> BookingHistory()
         {
-            if (!IsCustomer())
-                return RedirectToAction("Login", "Account");
+            try
+            {
+                if (!await IsCustomer())
+                    return RedirectToAction("Login", "Account");
 
-            var customerId = GetCustomerId();
+                var customerId = GetCustomerId();
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    TempData["Error"] = "Customer session not found.";
+                    return RedirectToAction("Login", "Account");
+                }
 
-            var bookings = await _context.Bookings
-                .Include(b => b.Car)
-                .Where(b => b.CustomerID == customerId)
-                .OrderByDescending(b => b.BookingDate)
-                .ToListAsync();
-
-            return View(bookings);
+                var bookings = await _customerService.GetCustomerAllBookingsAsync(customerId);
+                return View(bookings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ BookingHistory error: {ex.Message}");
+                TempData["Error"] = "An error occurred while loading booking history.";
+                return RedirectToAction("Dashboard");
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> CancelBooking(int id)
         {
-            if (!IsCustomer())
-                return RedirectToAction("Login", "Account");
-
-            var customerId = GetCustomerId();
-            var booking = await _context.Bookings
-                .Include(b => b.Car)
-                .FirstOrDefaultAsync(b => b.BookingID == id && b.CustomerID == customerId);
-
-            if (booking != null && booking.BookingStatus == "Confirmed" && booking.PickupDate > DateTime.Today)
+            try
             {
-                booking.BookingStatus = "Cancelled";
-                booking.Car.IsAvailable = true;
+                if (!await IsCustomer())
+                    return RedirectToAction("Login", "Account");
 
-                _context.Bookings.Update(booking);
-                _context.Cars.Update(booking.Car);
+                var customerId = GetCustomerId();
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    TempData["Error"] = "Customer session not found.";
+                    return RedirectToAction("Login", "Account");
+                }
 
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Booking cancelled successfully!";
+                var success = await _customerService.CancelBookingAsync(id, customerId);
+
+                if (success)
+                {
+                    TempData["Success"] = "Booking cancelled successfully!";
+                }
+                else
+                {
+                    TempData["Error"] = "Cannot cancel this booking. It may be too late or already cancelled.";
+                }
+
+                return RedirectToAction("BookingHistory");
             }
-            else
+            catch (Exception ex)
             {
-                TempData["Error"] = "Cannot cancel this booking.";
+                Console.WriteLine($"❌ CancelBooking error: {ex.Message}");
+                TempData["Error"] = "An error occurred while cancelling the booking.";
+                return RedirectToAction("BookingHistory");
             }
+        }
 
-            return RedirectToAction("BookingHistory");
+        public async Task<IActionResult> RentalHistory()
+        {
+            try
+            {
+                if (!await IsCustomer())
+                    return RedirectToAction("Login", "Account");
+
+                var customerId = GetCustomerId();
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    TempData["Error"] = "Customer session not found.";
+                    return RedirectToAction("Login", "Account");
+                }
+
+                var bookings = await _customerService.GetCustomerRecentBookingsAsync(customerId, 50);
+                return View(bookings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ RentalHistory error: {ex.Message}");
+                TempData["Error"] = "An error occurred while loading rental history.";
+                return RedirectToAction("Dashboard");
+            }
+        }
+
+        public async Task<IActionResult> ReturnHistory()
+        {
+            try
+            {
+                if (!await IsCustomer())
+                    return RedirectToAction("Login", "Account");
+
+                var customerId = GetCustomerId();
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    TempData["Error"] = "Customer session not found.";
+                    return RedirectToAction("Login", "Account");
+                }
+
+                var bookings = await _customerService.GetCustomerRecentBookingsAsync(customerId, 50);
+                return View(bookings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ ReturnHistory error: {ex.Message}");
+                TempData["Error"] = "An error occurred while loading return history.";
+                return RedirectToAction("Dashboard");
+            }
+        }
+
+        public async Task<IActionResult> PaymentHistory()
+        {
+            try
+            {
+                if (!await IsCustomer())
+                    return RedirectToAction("Login", "Account");
+
+                var customerId = GetCustomerId();
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    TempData["Error"] = "Customer session not found.";
+                    return RedirectToAction("Login", "Account");
+                }
+
+                var bookings = await _customerService.GetCustomerRecentBookingsAsync(customerId, 50);
+                return View(bookings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ PaymentHistory error: {ex.Message}");
+                TempData["Error"] = "An error occurred while loading payment history.";
+                return RedirectToAction("Dashboard");
+            }
         }
     }
 }

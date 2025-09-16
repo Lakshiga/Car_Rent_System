@@ -1,0 +1,106 @@
+@using Car_Rent_System.Enums
+@model IEnumerable<Car_Rent_System.ViewModels.Booking.BookingViewModel>
+@{
+    ViewData["Title"] = "Return History";
+    Layout = "_CustomerLayout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="cynex-font text-cynex-silver">
+                        <i class="fas fa-undo text-cynex-red"></i> Return History
+                    </h1>
+                    <p class="text-muted">View your completed car returns and payment summaries</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="cynex-card">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background: var(--cynex-red); color: white;">
+                    <h5 class="mb-0 cynex-font">
+                        <i class="fas fa-list"></i> Completed Returns
+                    </h5>
+                    <span class="badge bg-light text-dark">@Model.Count() Total</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead style="background: rgba(255, 0, 0, 0.1);">
+                                    <tr>
+                                        <th>Car Details</th>
+                                        <th>Pickup Date</th>
+                                        <th>Return Date</th>
+                                        <th>Distance Traveled</th>
+                                        <th>Payment Summary</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var booking in Model.Where(b => b.BookingStatus == BookingStatus.Completed))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="@booking.Car?.ImageUrl" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;" alt="Car">
+                                                    <div>
+                                                        <div class="fw-bold text-cynex-silver">@booking.Car?.CarName</div>
+                                                        <small class="text-muted">@booking.Car?.CarModel</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-cynex-silver">@booking.PickupDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="text-cynex-silver">@booking.ReturnDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="text-cynex-silver">
+                                                @if (booking.DistanceTraveled.HasValue)
+                                                {
+                                                    @($"{booking.DistanceTraveled.Value:N0} km")
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">N/A</span>
+                                                }
+                                            </td>
+
+                                            <td>
+                                                <div class="small">
+                                                    <div><strong>Total:</strong> $@booking.TotalCost.ToString("F2")</div>
+                                                    @if (booking.AdvancePayment.HasValue)
+                                                    {
+                                                        <div><strong>Advance:</strong> $@booking.AdvancePayment.Value.ToString("F2")</div>
+                                                    }
+                                                    @if (booking.RemainingAmount.HasValue)
+                                                    {
+                                                        <div><strong>Balance:</strong> $@booking.RemainingAmount.Value.ToString("F2")</div>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">Completed</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-undo fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No return history</h5>
+                            <p class="text-muted">Your completed returns will appear here.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

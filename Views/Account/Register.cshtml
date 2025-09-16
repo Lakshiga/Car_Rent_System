@@ -1,5 +1,4 @@
-﻿@model Car_Rent_System.Models.User
-
+﻿@model Car_Rent_System.ViewModels.Account.RegisterViewModel
 @{
     ViewData["Title"] = "Register";
 }
@@ -22,7 +21,7 @@
                         </div>
                     }
 
-                    <form asp-action="Register" method="post" onsubmit="return validateRegistration()">
+                    <form asp-action="Register" method="post">
                         <div class="row">
                             <div class="col-md-6 mb-4">
                                 <label asp-for="Username" class="form-label">
@@ -33,7 +32,7 @@
                             </div>
                             <div class="col-md-6 mb-4">
                                 <label asp-for="FullName" class="form-label">
-                                    <i class="fas fa-id-card text-cynex-red"></i> Full Name
+                                    <i class="fas fa-id-card text-cynex-red"></i> Full Name *
                                 </label>
                                 <input asp-for="FullName" class="form-control" placeholder="Your full name" />
                                 <span asp-validation-for="FullName" class="text-danger"></span>
@@ -56,38 +55,44 @@
                             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                         </div>
 
+                        <div class="mb-4">
+                            <label asp-for="RequestedRole" class="form-label">
+                                <i class="fas fa-user-tag text-cynex-red"></i> Select Role *
+                            </label>
+                            <select asp-for="RequestedRole" class="form-select" required>
+                                <option value="">-- Select your role --</option>
+                                <option value="Customer">Customer</option>
+                                <option value="Driver">Driver</option>
+                                <option value="VehicleOwner">Vehicle Owner</option>
+                            </select>
+                            <span asp-validation-for="RequestedRole" class="text-danger"></span>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-6 mb-4">
                                 <label asp-for="Password" class="form-label">
                                     <i class="fas fa-lock text-cynex-red"></i> Password *
                                 </label>
-                                <input asp-for="Password" type="password" class="form-control" id="Password" placeholder="Minimum 6 characters" />
+                                <input asp-for="Password" type="password" class="form-control" placeholder="Minimum 6 characters" />
                                 <span asp-validation-for="Password" class="text-danger"></span>
                             </div>
                             <div class="col-md-6 mb-4">
-                                <label for="ConfirmPassword" class="form-label">
+                                <label asp-for="ConfirmPassword" class="form-label">
                                     <i class="fas fa-lock text-cynex-red"></i> Confirm Password *
                                 </label>
-                                <input type="password" id="ConfirmPassword" class="form-control" placeholder="Confirm your password" />
+                                <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Confirm your password" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="mb-4">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="agreeTerms" required />
-                                <label class="form-check-label text-cynex-silver" for="agreeTerms">
+                                <input asp-for="AgreeTerms" class="form-check-input" type="checkbox" required />
+                                <label class="form-check-label text-cynex-silver" for="AgreeTerms">
                                     I agree to the <a href="#" class="text-cynex-red">Terms of Service</a> and
                                     <a href="#" class="text-cynex-red">Privacy Policy</a>
                                 </label>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="newsletter" />
-                                <label class="form-check-label text-cynex-silver" for="newsletter">
-                                    Subscribe to exclusive offers and updates
-                                </label>
+                                <span asp-validation-for="AgreeTerms" class="text-danger"></span>
                             </div>
                         </div>
 
@@ -112,40 +117,53 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-
     <script>
-        function validateRegistration() {
-            const password = document.getElementById("Password").value;
-            const confirmPassword = document.getElementById("ConfirmPassword").value;
-
-            if (password !== confirmPassword) {
-                alert("Passwords do not match.");
-                return false;
-            }
-
-            if (password.length < 6) {
-                alert("Password must be at least 6 characters.");
-                return false;
-            }
-
-            return true;
-        }
-
         document.addEventListener("DOMContentLoaded", function () {
-            const confirmInput = document.getElementById('ConfirmPassword');
+            const form = document.querySelector('form');
             const passwordInput = document.getElementById('Password');
+            const confirmPasswordInput = document.getElementById('ConfirmPassword');
 
-            confirmInput.addEventListener('input', function () {
+            // Password confirmation validation
+            confirmPasswordInput.addEventListener('input', function () {
+                validatePasswordMatch();
+            });
+
+            passwordInput.addEventListener('input', function () {
+                validatePasswordMatch();
+            });
+
+            function validatePasswordMatch() {
                 const password = passwordInput.value;
-                const confirm = this.value;
+                const confirmPassword = confirmPasswordInput.value;
 
-                if (confirm && password !== confirm) {
-                    this.setCustomValidity('Passwords do not match');
-                    this.classList.add('is-invalid');
+                if (confirmPassword && password !== confirmPassword) {
+                    confirmPasswordInput.setCustomValidity('Passwords do not match');
+                    confirmPasswordInput.classList.add('is-invalid');
+                    confirmPasswordInput.classList.remove('is-valid');
                 } else {
-                    this.setCustomValidity('');
-                    this.classList.remove('is-invalid');
-                    if (confirm) this.classList.add('is-valid');
+                    confirmPasswordInput.setCustomValidity('');
+                    confirmPasswordInput.classList.remove('is-invalid');
+                    if (confirmPassword) {
+                        confirmPasswordInput.classList.add('is-valid');
+                    }
+                }
+            }
+
+            // Form submission validation
+            form.addEventListener('submit', function(e) {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+
+                if (password.length < 6) {
+                    alert('Password must be at least 6 characters long.');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match.');
+                    e.preventDefault();
+                    return;
                 }
             });
         });

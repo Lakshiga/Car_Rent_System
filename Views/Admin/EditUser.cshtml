@@ -1,0 +1,81 @@
+﻿@model Car_Rent_System.ViewModels.Admin.EditUserViewModel
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="cynex-card p-5">
+                <div class="text-center mb-5">
+                    <h2 class="cynex-font text-cynex-silver mb-3">EDIT USER</h2>
+                    <p class="text-muted">Modify user details and role</p>
+                </div>
+
+                <form asp-action="EditUser" method="post">
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Username" class="form-label">
+                                <i class="fas fa-user text-cynex-blue"></i> Username *
+                            </label>
+                            <input asp-for="Username" class="form-control" readonly />
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="FullName" class="form-label">
+                                <i class="fas fa-id-card text-cynex-blue"></i> Full Name *
+                            </label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Email" class="form-label">
+                            <i class="fas fa-envelope text-cynex-blue"></i> Email Address *
+                        </label>
+                        <input asp-for="Email" type="email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="PhoneNumber" class="form-label">
+                            <i class="fas fa-phone text-cynex-blue"></i> Phone Number *
+                        </label>
+                        <input asp-for="PhoneNumber" class="form-control" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="SelectedRole" class="form-label">
+                            <i class="fas fa-user-tag text-cynex-blue"></i> Select Role *
+                        </label>
+                        <select asp-for="SelectedRole" class="form-select" required>
+                            <option value="">-- Select user role --</option>
+                            @foreach (var role in Model.AvailableRoles)
+                            {
+                                <option value="@role" selected="@(Model.CurrentRoles.Contains(role) ? "selected" : null)">@role</option>
+                            }
+                        </select>
+                        <span asp-validation-for="SelectedRole" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-3">
+                        <button type="submit" class="btn btn-cynex-primary btn-lg">
+                            <i class="fas fa-save"></i> SAVE CHANGES
+                        </button>
+                        <a asp-action="UserManagement" class="btn btn-cynex-secondary btn-lg">
+                            <i class="fas fa-arrow-left"></i> CANCEL
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

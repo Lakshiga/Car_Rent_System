@@ -1,7 +1,8 @@
-﻿@model Car_Rent_System.Models.Booking
+﻿@model Car_Rent_System.ViewModels.Booking.BookingViewModel
 
 @{
     ViewData["Title"] = "Book Car";
+    Layout = "_CustomerLayout";
     var car = ViewBag.Car as Car_Rent_System.Models.Car;
 }
 
@@ -22,8 +23,8 @@
                         </div>
                     }
 
-                    <form asp-action="BookCar" method="post" onsubmit="return validateBookingDates()">
-                        <input type="hidden" asp-for="CarID" />
+                    <form asp-action="BookCar" method="post" enctype="multipart/form-data" onsubmit="return validateBookingDates()">
+                        <input type="hidden" asp-for="Id" />
                         <input type="hidden" id="DailyRate" value="@car?.DailyRate" />
 
                         <div class="row">
@@ -43,32 +44,56 @@
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="PickupLocation" class="form-label">
-                                    <i class="fas fa-map-marker-alt"></i> Pickup Location
-                                </label>
-                                <select asp-for="PickupLocation" class="form-select">
-                                    <option value="">Select pickup location</option>
-                                    <option value="Downtown Branch">Downtown Branch</option>
-                                    <option value="Airport Terminal">Airport Terminal</option>
-                                    <option value="Mall Location">Mall Location</option>
-                                    <option value="Hotel Pickup">Hotel Pickup</option>
-                                </select>
+
+                        <!-- Customer Details Section -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-user"></i> Customer Details
+                                </h5>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ReturnLocation" class="form-label">
-                                    <i class="fas fa-map-marker-alt"></i> Return Location
-                                </label>
-                                <select asp-for="ReturnLocation" class="form-select">
-                                    <option value="">Select return location</option>
-                                    <option value="Downtown Branch">Downtown Branch</option>
-                                    <option value="Airport Terminal">Airport Terminal</option>
-                                    <option value="Mall Location">Mall Location</option>
-                                    <option value="Hotel Pickup">Hotel Pickup</option>
-                                </select>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="LicenseNumber" class="form-label">
+                                            <i class="fas fa-id-card"></i> License Number *
+                                        </label>
+                                        <input asp-for="LicenseNumber" class="form-control" placeholder="Enter your license number" required />
+                                        <span asp-validation-for="LicenseNumber" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="NICNumber" class="form-label">
+                                            <i class="fas fa-id-card"></i> NIC Number *
+                                        </label>
+                                        <input asp-for="NICNumber" class="form-control" placeholder="Enter your NIC number" required />
+                                        <span asp-validation-for="NICNumber" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="licenseFrontFile" class="form-label">
+                                            <i class="fas fa-id-card"></i> License Front Image *
+                                        </label>
+                                        <input type="file" id="licenseFrontFile" name="licenseFrontFile" class="form-control" accept="image/*" required />
+                                        <small class="form-text text-muted">Upload front side of your driving license</small>
+                                        <div id="licenseFrontPreview" class="mt-2" style="display: none;">
+                                            <img id="licenseFrontImg" src="" alt="License Front Preview" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="licenseBackFile" class="form-label">
+                                            <i class="fas fa-id-card"></i> License Back Image *
+                                        </label>
+                                        <input type="file" id="licenseBackFile" name="licenseBackFile" class="form-control" accept="image/*" required />
+                                        <small class="form-text text-muted">Upload back side of your driving license</small>
+                                        <div id="licenseBackPreview" class="mt-2" style="display: none;">
+                                            <img id="licenseBackImg" src="" alt="License Back Preview" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
 
                         <div class="mb-3">
                             <label asp-for="SpecialRequirements" class="form-label">
@@ -82,12 +107,22 @@
                             <div class="card-body">
                                 <h5 class="card-title">Booking Summary</h5>
                                 <div class="row">
-                                    <div class="col-6">
-                                        <p class="mb-1"><strong>Total Days:</strong> <span id="TotalDays">-</span></p>
-                                        <p class="mb-1"><strong>Daily Rate:</strong> $@car?.DailyRate</p>
+                                    <div class="col-md-6">
+                                        <div id="dailyRateInfo">
+                                            <p class="mb-1"><strong>Total Days:</strong> <span id="TotalDays">-</span></p>
+                                            <p class="mb-1"><strong>Daily Rate:</strong> $@car?.DailyRate</p>
+                                        </div>
+                                        <div id="distanceInfo" style="display: none;">
+                                            <p class="mb-1"><strong>Distance Traveled:</strong> <span id="DistanceTraveled">-</span> km</p>
+                                            <p class="mb-1"><strong>Per KM Rate:</strong> $<span id="PerKmRate">@car?.PerKilometerRate?.ToString("0.00") ?? "2.50"</span></p>
+                                        </div>
                                     </div>
-                                    <div class="col-6 text-end">
+                                    <div class="col-md-6 text-end">
                                         <h4 class="text-primary"><strong>Total Cost: <span id="TotalCost">$0.00</span></strong></h4>
+                                        <div id="advancePaymentInfo" style="display: none;">
+                                            <p class="mb-1"><strong>Advance Payment (50%):</strong> <span id="AdvancePayment">$0.00</span></p>
+                                            <p class="mb-1"><strong>Remaining Amount:</strong> <span id="RemainingAmount">$0.00</span></p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -198,15 +233,28 @@
             var dailyRate = parseFloat($('#DailyRate').val()) || 0;
 
             if (pickupDate && returnDate && returnDate > pickupDate) {
+                // Calculate based on daily rate only
                 var timeDiff = returnDate.getTime() - pickupDate.getTime();
                 var daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
                 var totalCost = daysDiff * dailyRate;
+                var advancePayment = totalCost * 0.5;
+                var remainingAmount = totalCost - advancePayment;
 
                 $('#TotalDays').text(daysDiff + ' day' + (daysDiff > 1 ? 's' : ''));
                 $('#TotalCost').text('$' + totalCost.toFixed(2));
+                $('#AdvancePayment').text('$' + advancePayment.toFixed(2));
+                $('#RemainingAmount').text('$' + remainingAmount.toFixed(2));
+
+                // Show daily rate info, hide distance info
+                $('#dailyRateInfo').show();
+                $('#distanceInfo').hide();
+                $('#advancePaymentInfo').show();
             } else {
                 $('#TotalDays').text('-');
                 $('#TotalCost').text('$0.00');
+                $('#AdvancePayment').text('$0.00');
+                $('#RemainingAmount').text('$0.00');
+                $('#advancePaymentInfo').hide();
             }
         }
 
@@ -223,6 +271,35 @@
         // Initialize calculation on page load
         $(document).ready(function () {
             calculateTotalCost();
+        });
+
+        // File preview functionality
+        document.getElementById('licenseFrontFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('licenseFrontImg').src = e.target.result;
+                    document.getElementById('licenseFrontPreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('licenseFrontPreview').style.display = 'none';
+            }
+        });
+
+        document.getElementById('licenseBackFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('licenseBackImg').src = e.target.result;
+                    document.getElementById('licenseBackPreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('licenseBackPreview').style.display = 'none';
+            }
         });
     </script>
 }

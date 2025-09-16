@@ -7,17 +7,23 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --cynex-black: #000000;
             --cynex-silver: #C0C0C0;
             --cynex-blue: #0A2472;
+            --cynex-gold: #D4AF37;
+            --cynex-neon-blue: #00B4FF;
             --cynex-dark-silver: #808080;
             --cynex-light-silver: #E8E8E8;
             --cynex-gradient: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
             --cynex-blue-gradient: linear-gradient(45deg, #0A2472, #0D3B9E);
+            --cynex-gold-gradient: linear-gradient(45deg, #D4AF37, #F9E076);
+            --cynex-neon-gradient: linear-gradient(45deg, #00B4FF, #0066FF);
             --cynex-silver-gradient: linear-gradient(45deg, #C0C0C0, #E8E8E8);
+            --cynex-purple: #6A0DAD;
+            --cynex-red: #C8102E;
         }
 
         * {
@@ -32,8 +38,10 @@
             color: var(--cynex-silver);
             line-height: 1.6;
             overflow-x: hidden;
+            position: relative;
         }
 
+            /* Animated Background */
             body::before {
                 content: '';
                 position: fixed;
@@ -41,16 +49,58 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: radial-gradient(circle at 20% 80%, rgba(10, 36, 114, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(192, 192, 192, 0.1) 0%, transparent 50%), var(--cynex-black);
+                background: radial-gradient(circle at 20% 80%, rgba(10, 36, 114, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(0, 180, 255, 0.05) 0%, transparent 70%), var(--cynex-black);
+                z-index: -2;
+            }
+
+            /* Floating Particles */
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image: radial-gradient(circle, rgba(212, 175, 55, 0.4) 1px, transparent 1px), radial-gradient(circle, rgba(0, 180, 255, 0.3) 1px, transparent 1px), radial-gradient(circle, rgba(192, 192, 192, 0.2) 1px, transparent 1px);
+                background-size: 50px 50px, 70px 70px, 90px 90px;
+                background-position: 0 0, 25px 25px, 50px 50px;
+                opacity: 0.3;
+                animation: float 20s linear infinite;
                 z-index: -1;
             }
 
+        @@keyframes float {
+            0% {
+                background-position: 0 0, 25px 25px, 50px 50px;
+            }
+
+            100% {
+                background-position: 100px 100px, 125px 125px, 150px 150px;
+            }
+        }
+
         .cynex-font {
             font-family: 'Orbitron', monospace;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            position: relative;
         }
+
+            .cynex-font::after {
+                content: '';
+                position: absolute;
+                bottom: -5px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: var(--cynex-gold-gradient);
+                transition: width 0.5s ease;
+            }
+
+            .cynex-font:hover::after {
+                width: 100%;
+            }
 
         .text-cynex-silver {
             color: var(--cynex-silver) !important;
@@ -60,18 +110,33 @@
             color: var(--cynex-blue) !important;
         }
 
+        .text-cynex-gold {
+            color: var(--cynex-gold) !important;
+        }
+
+        .text-cynex-neon {
+            color: var(--cynex-neon-blue) !important;
+        }
+
+        /* Enhanced Navbar */
         .navbar {
-            background: rgba(0, 0, 0, 0.95) !important;
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid var(--cynex-blue);
-            box-shadow: 0 4px 20px rgba(10, 36, 114, 0.3);
+            background: rgba(0, 0, 0, 0.92) !important;
+            backdrop-filter: blur(15px);
+            border-bottom: 2px solid transparent;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
             padding: 1rem 0;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
 
             .navbar.scrolled {
                 background: rgba(0, 0, 0, 0.98) !important;
-                box-shadow: 0 4px 30px rgba(10, 36, 114, 0.5);
+                box-shadow: 0 8px 40px rgba(10, 36, 114, 0.6);
+                border-bottom: 2px solid var(--cynex-gold);
+                transform: translateY(0);
             }
 
         .navbar-brand {
@@ -79,40 +144,60 @@
             align-items: center;
             font-family: 'Orbitron', monospace;
             font-weight: 900;
-            font-size: 1.5rem;
-            color: var(--cynex-silver) !important;
+            font-size: 1.8rem;
+            color: var(--cynex-gold) !important;
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
         }
 
-            .navbar-brand:hover {
-                color: var(--cynex-blue) !important;
-                transform: scale(1.05);
+            .navbar-brand::before {
+                content: '';
+                position: absolute;
+                bottom: -5px;
+                left: 0;
+                width: 100%;
+                height: 3px;
+                background: var(--cynex-gold-gradient);
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             }
 
+            .navbar-brand:hover {
+                color: var(--cynex-neon-blue) !important;
+                transform: scale(1.08) rotate(2deg);
+            }
+
+                .navbar-brand:hover::before {
+                    transform: scaleX(1);
+                }
+
             .navbar-brand img {
-                height: 50px;
+                height: 55px;
                 width: auto;
                 margin-right: 15px;
-                filter: drop-shadow(0 0 10px rgba(10, 36, 114, 0.5));
-                transition: all 0.3s ease;
+                filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.7));
+                transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                transform: rotate(0);
             }
 
             .navbar-brand:hover img {
-                filter: drop-shadow(0 0 20px rgba(10, 36, 114, 0.8));
-                transform: rotate(5deg);
+                filter: drop-shadow(0 0 25px rgba(212, 175, 55, 1));
+                transform: rotate(10deg);
             }
 
         .navbar .nav-link {
             color: var(--cynex-silver) !important;
             font-weight: 600;
             font-size: 1.1rem;
-            margin: 0 10px;
-            padding: 10px 20px !important;
-            border-radius: 25px;
+            margin: 0 8px;
+            padding: 12px 25px !important;
+            border-radius: 30px;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            border: 1px solid transparent;
         }
 
             .navbar .nav-link::before {
@@ -122,33 +207,47 @@
                 left: -100%;
                 width: 100%;
                 height: 100%;
-                background: var(--cynex-blue-gradient);
-                transition: all 0.3s ease;
+                background: var(--cynex-gold-gradient);
+                transition: all 0.4s ease;
                 z-index: -1;
             }
 
             .navbar .nav-link:hover {
-                color: white !important;
-                transform: translateY(-2px);
+                color: var(--cynex-black) !important;
+                transform: translateY(-3px) scale(1.05);
+                border: 1px solid var(--cynex-gold);
+                box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
             }
 
                 .navbar .nav-link:hover::before {
                     left: 0;
                 }
 
+            .navbar .nav-link i {
+                margin-right: 8px;
+                transition: transform 0.3s ease;
+            }
+
+            .navbar .nav-link:hover i {
+                transform: rotate(15deg);
+            }
+
+        /* Premium Buttons */
         .btn-cynex-primary {
-            background: var(--cynex-blue-gradient);
+            background: var(--cynex-gold-gradient);
             border: none;
-            color: white;
-            font-weight: 600;
-            padding: 12px 30px;
-            border-radius: 30px;
+            color: var(--cynex-black);
+            font-weight: 700;
+            padding: 15px 40px;
+            border-radius: 50px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(10, 36, 114, 0.3);
+            letter-spacing: 2px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
             position: relative;
             overflow: hidden;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
         }
 
             .btn-cynex-primary::before {
@@ -158,33 +257,53 @@
                 left: -100%;
                 width: 100%;
                 height: 100%;
-                background: linear-gradient(45deg, #0D3B9E, #0A2472);
-                transition: all 0.3s ease;
+                background: linear-gradient(45deg, #F9E076, #D4AF37);
+                transition: all 0.4s ease;
                 z-index: -1;
             }
 
             .btn-cynex-primary:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 8px 25px rgba(10, 36, 114, 0.5);
-                color: white;
+                transform: translateY(-5px) scale(1.05);
+                box-shadow: 0 15px 35px rgba(212, 175, 55, 0.6);
+                color: var(--cynex-black);
+                letter-spacing: 3px;
             }
 
                 .btn-cynex-primary:hover::before {
                     left: 0;
                 }
 
+            .btn-cynex-primary::after {
+                content: '';
+                position: absolute;
+                width: 150%;
+                height: 150%;
+                background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+                top: -25%;
+                left: -25%;
+                opacity: 0;
+                transition: opacity 0.4s;
+            }
+
+            .btn-cynex-primary:hover::after {
+                opacity: 1;
+            }
+
         .btn-cynex-secondary {
             background: transparent;
-            border: 2px solid var(--cynex-silver);
-            color: var(--cynex-silver);
-            font-weight: 600;
-            padding: 12px 30px;
-            border-radius: 30px;
+            border: 2px solid var(--cynex-gold);
+            color: var(--cynex-gold);
+            font-weight: 700;
+            padding: 15px 40px;
+            border-radius: 50px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
+            letter-spacing: 2px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
             overflow: hidden;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.2);
         }
 
             .btn-cynex-secondary::before {
@@ -194,30 +313,32 @@
                 left: -100%;
                 width: 100%;
                 height: 100%;
-                background: var(--cynex-silver-gradient);
-                transition: all 0.3s ease;
+                background: var(--cynex-gold-gradient);
+                transition: all 0.4s ease;
                 z-index: -1;
             }
 
             .btn-cynex-secondary:hover {
                 color: var(--cynex-black);
-                border-color: var(--cynex-silver);
-                transform: translateY(-3px);
-                box-shadow: 0 8px 25px rgba(192, 192, 192, 0.3);
+                transform: translateY(-5px) scale(1.05);
+                box-shadow: 0 15px 35px rgba(212, 175, 55, 0.4);
+                letter-spacing: 3px;
             }
 
                 .btn-cynex-secondary:hover::before {
                     left: 0;
                 }
 
+        /* Premium Cards */
         .cynex-card {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(192, 192, 192, 0.2);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+            background: rgba(10, 15, 30, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 25px;
+            backdrop-filter: blur(15px);
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
             overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
             .cynex-card::before {
@@ -226,105 +347,218 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                height: 3px;
-                background: var(--cynex-blue-gradient);
+                height: 4px;
+                background: var(--cynex-gold-gradient);
                 transform: scaleX(0);
-                transition: transform 0.3s ease;
+                transition: transform 0.5s ease;
+            }
+
+            .cynex-card::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, transparent 100%);
+                opacity: 0;
+                transition: opacity 0.5s ease;
+                z-index: -1;
             }
 
             .cynex-card:hover {
-                transform: translateY(-10px);
-                border-color: var(--cynex-blue);
-                box-shadow: 0 20px 40px rgba(10, 36, 114, 0.2);
+                transform: translateY(-15px) scale(1.02);
+                border-color: var(--cynex-gold);
+                box-shadow: 0 25px 50px rgba(212, 175, 55, 0.3);
             }
 
                 .cynex-card:hover::before {
                     transform: scaleX(1);
                 }
 
+                .cynex-card:hover::after {
+                    opacity: 1;
+                }
+
+        /* Hero Section */
         .hero-section {
-            background: var(--cynex-gradient);
+            background: linear-gradient(135deg, rgba(10, 20, 40, 0.9) 0%, rgba(5, 10, 25, 0.95) 100%), url('https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80');
+            background-size: cover;
+            background-position: center;
             min-height: 100vh;
             display: flex;
             align-items: center;
             position: relative;
             overflow: hidden;
+            padding: 100px 0;
         }
+
+            .hero-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle at 30% 70%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+                z-index: -1;
+            }
 
         .hero-content {
             position: relative;
             z-index: 2;
+            text-align: center;
+            padding: 0 20px;
         }
 
         .hero-title {
             font-family: 'Orbitron', monospace;
             font-weight: 900;
-            font-size: 4rem;
-            background: var(--cynex-silver-gradient);
+            font-size: 5rem;
+            background: linear-gradient(90deg, var(--cynex-gold), var(--cynex-neon-blue), var(--cynex-gold));
+            background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             text-align: center;
             margin-bottom: 2rem;
-            filter: drop-shadow(0 0 20px rgba(192, 192, 192, 0.6));
+            filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.8));
+            animation: gradientShift 6s ease infinite;
+            position: relative;
+        }
+
+        @@keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         .hero-subtitle {
-            font-size: 1.5rem;
+            font-size: 2rem;
             color: var(--cynex-silver);
             text-align: center;
             margin-bottom: 3rem;
             font-weight: 300;
+            position: relative;
+            display: inline-block;
+            padding: 0 20px;
         }
 
+            .hero-subtitle::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100px;
+                height: 3px;
+                background: var(--cynex-gold-gradient);
+            }
+
+        /* Stats Cards */
         .stats-card {
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px solid var(--cynex-blue);
-            border-radius: 20px;
-            padding: 2rem;
+            background: rgba(5, 15, 35, 0.9);
+            border: 2px solid var(--cynex-gold);
+            border-radius: 30px;
+            padding: 2.5rem;
             text-align: center;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
-            .stats-card::after {
+            .stats-card::before {
                 content: '';
                 position: absolute;
-                inset: 2px;
-                background: var(--cynex-black);
-                border-radius: 18px;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+                animation: rotate 20s linear infinite;
                 z-index: -1;
             }
 
-            .stats-card:hover {
-                transform: scale(1.05);
-                box-shadow: 0 10px 30px rgba(10, 36, 114, 0.4);
+        /* @@keyframes rotate {
+            from {
+                transform: rotate(0deg);
             }
+
+            to {
+                transform: rotate(360deg);
+            }
+        } */
+
+        .stats-card::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            background: rgba(5, 15, 35, 0.95);
+            border-radius: 27px;
+            z-index: -1;
+        }
+
+        .stats-card:hover {
+            transform: scale(1.08) rotate(2deg);
+            box-shadow: 0 20px 50px rgba(212, 175, 55, 0.5);
+            border-color: var(--cynex-neon-blue);
+        }
 
         .stats-number {
             font-family: 'Orbitron', monospace;
-            font-size: 3rem;
+            font-size: 4rem;
             font-weight: 900;
-            color: var(--cynex-blue);
+            background: linear-gradient(90deg, var(--cynex-gold), var(--cynex-neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
         }
 
         .stats-label {
             color: var(--cynex-silver);
-            font-size: 1.2rem;
-            font-weight: 500;
+            font-size: 1.5rem;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
         }
 
+            .stats-label::after {
+                content: '';
+                position: absolute;
+                bottom: -5px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: var(--cynex-gold);
+                transition: width 0.3s ease;
+            }
+
+        .stats-card:hover .stats-label::after {
+            width: 100%;
+        }
+
+        /* Car Cards */
         .car-card {
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid rgba(192, 192, 192, 0.2);
-            border-radius: 20px;
+            background: rgba(10, 15, 35, 0.9);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 30px;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
         }
 
             .car-card::before {
@@ -333,123 +567,216 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                height: 4px;
-                background: var(--cynex-blue-gradient);
+                height: 5px;
+                background: var(--cynex-gold-gradient);
                 transform: scaleX(0);
-                transition: transform 0.3s ease;
+                transition: transform 0.5s ease;
             }
 
             .car-card:hover {
-                transform: translateY(-15px);
-                box-shadow: 0 25px 50px rgba(10, 36, 114, 0.3);
-                border-color: var(--cynex-blue);
+                transform: translateY(-20px) scale(1.03);
+                box-shadow: 0 30px 60px rgba(212, 175, 55, 0.4);
+                border-color: var(--cynex-gold);
             }
 
                 .car-card:hover::before {
                     transform: scaleX(1);
                 }
 
+        .car-image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 30px 30px 0 0;
+        }
+
         .car-image {
-            height: 250px;
-            object-fit: cover;
+            height: 300px;
             width: 100%;
-            transition: all 0.3s ease;
+            object-fit: cover;
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: scale(1);
         }
 
         .car-card:hover .car-image {
-            transform: scale(1.1);
+            transform: scale(1.15);
+            filter: brightness(1.1);
+        }
+
+        .car-image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            color: white;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .car-card:hover .car-image-overlay {
+            transform: translateY(0);
+            opacity: 1;
         }
 
         .price-tag {
-            background: var(--cynex-blue-gradient);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-weight: 700;
-            font-size: 1.2rem;
+            background: var(--cynex-gold-gradient);
+            color: var(--cynex-black);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 1.4rem;
             display: inline-block;
-            box-shadow: 0 4px 15px rgba(10, 36, 114, 0.3);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5);
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 1px;
         }
 
+            .price-tag::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, #F9E076, #D4AF37, #F9E076);
+                transition: left 0.8s ease;
+            }
+
+            .price-tag:hover::before {
+                left: 100%;
+            }
+
+        /* Form Controls */
         .form-control {
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid rgba(192, 192, 192, 0.3);
-            border-radius: 10px;
+            background: rgba(5, 15, 35, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
             color: var(--cynex-silver);
-            padding: 15px;
+            padding: 18px 20px;
             font-size: 1.1rem;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            font-family: 'Rajdhani', sans-serif;
         }
 
             .form-control:focus {
-                background: rgba(0, 0, 0, 0.9);
-                border-color: var(--cynex-blue);
-                box-shadow: 0 0 20px rgba(10, 36, 114, 0.3);
+                background: rgba(5, 15, 35, 0.9);
+                border-color: var(--cynex-gold);
+                box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
                 color: white;
             }
 
             .form-control::placeholder {
                 color: rgba(192, 192, 192, 0.6);
+                font-family: 'Rajdhani', sans-serif;
             }
 
         .form-label {
-            color: var(--cynex-silver);
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 8px;
+            color: var(--cynex-gold);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 1px;
         }
 
+        /* Tables */
         .table {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(5, 15, 35, 0.9);
             color: var(--cynex-silver);
-            border-radius: 15px;
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(212, 175, 55, 0.2);
         }
 
             .table th {
-                background: var(--cynex-blue);
-                color: white;
-                font-weight: 700;
+                background: rgba(10, 36, 114, 0.9);
+                color: var(--cynex-gold);
+                font-weight: 800;
                 text-transform: uppercase;
-                letter-spacing: 1px;
+                letter-spacing: 2px;
                 border: none;
-                padding: 20px;
+                padding: 25px;
+                font-family: 'Orbitron', monospace;
             }
 
             .table td {
-                border-color: rgba(192, 192, 192, 0.1);
-                padding: 15px 20px;
+                border-color: rgba(212, 175, 55, 0.1);
+                padding: 20px 25px;
                 vertical-align: middle;
+                font-size: 1.1rem;
             }
 
-            .table tbody tr:hover {
-                background: rgba(10, 36, 114, 0.1);
+            .table tbody tr {
+                transition: all 0.3s ease;
             }
 
+                .table tbody tr:hover {
+                    background: rgba(212, 175, 55, 0.05);
+                    transform: scale(1.01);
+                }
+
+        /* Badges */
         .badge {
-            font-size: 0.9rem;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: 600;
+            font-size: 1rem;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            font-family: 'Orbitron', monospace;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
             .badge.bg-success {
                 background: linear-gradient(45deg, #00FF00, #00CC00) !important;
+                border: 2px solid rgba(255, 255, 255, 0.2);
             }
 
             .badge.bg-danger {
-                background: var(--cynex-blue-gradient) !important;
+                background: var(--cynex-gold-gradient) !important;
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                color: var(--cynex-black) !important;
             }
 
+        /* Alerts */
         .alert {
             border: none;
-            border-radius: 15px;
-            padding: 20px;
-            font-weight: 500;
+            border-radius: 20px;
+            padding: 25px 30px;
+            font-weight: 600;
             border-left: 5px solid;
+            position: relative;
+            overflow: hidden;
+            animation: slideInRight 0.5s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* @@keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        } */
+
+        .alert::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--cynex-gold-gradient);
         }
 
         .alert-success {
@@ -459,43 +786,105 @@
         }
 
         .alert-danger {
-            background: rgba(10, 36, 114, 0.1);
-            color: var(--cynex-blue);
-            border-left-color: var(--cynex-blue);
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--cynex-gold);
+            border-left-color: var(--cynex-gold);
         }
 
+        /* Footer */
         .footer {
-            background: var(--cynex-black);
-            border-top: 3px solid var(--cynex-blue);
+            background: rgba(5, 10, 20, 0.95);
+            border-top: 3px solid var(--cynex-gold);
             color: var(--cynex-silver);
-            padding: 4rem 0 2rem;
+            padding: 5rem 0 3rem;
             margin-top: 5rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
         }
+
+            .footer::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle at 30% 70%, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+                z-index: 0;
+            }
 
             .footer h5 {
-                color: var(--cynex-blue);
+                color: var(--cynex-gold);
                 font-family: 'Orbitron', monospace;
-                font-weight: 700;
+                font-weight: 800;
                 text-transform: uppercase;
-                letter-spacing: 2px;
-                margin-bottom: 1.5rem;
+                letter-spacing: 3px;
+                margin-bottom: 2rem;
+                position: relative;
+                display: inline-block;
             }
+
+                .footer h5::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -10px;
+                    left: 0;
+                    width: 50px;
+                    height: 3px;
+                    background: var(--cynex-gold);
+                }
 
             .footer a {
                 color: var(--cynex-silver);
                 text-decoration: none;
                 transition: all 0.3s ease;
+                position: relative;
+                display: inline-block;
+                padding: 5px 0;
             }
 
-                .footer a:hover {
-                    color: var(--cynex-blue);
-                    transform: translateX(5px);
+                .footer a::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 0;
+                    height: 2px;
+                    background: var(--cynex-gold);
+                    transition: width 0.3s ease;
                 }
 
-        .animate-fade-in {
+                .footer a:hover {
+                    color: var(--cynex-gold);
+                    transform: translateX(8px);
+                }
+
+                    .footer a:hover::after {
+                        width: 100%;
+                    }
+
+        .social-links a {
+            transition: all 0.3s ease;
+            display: inline-block;
+            padding: 10px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.1);
+            margin: 5px;
+        }
+
+            .social-links a:hover {
+                transform: translateY(-5px) scale(1.2);
+                background: var(--cynex-gold);
+                color: var(--cynex-black);
+                box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
+            }
+
+        /* Animations */
+        /* .animate-fade-in {
             opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease;
+            transform: translateY(50px);
+            transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
             .animate-fade-in.visible {
@@ -505,8 +894,8 @@
 
         .animate-slide-in {
             opacity: 0;
-            transform: translateX(-50px);
-            transition: all 0.8s ease;
+            transform: translateX(-100px);
+            transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
             .animate-slide-in.visible {
@@ -514,17 +903,37 @@
                 transform: translateX(0);
             }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--cynex-blue);
+        .animate-scale-in {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
+            .animate-scale-in.visible {
+                opacity: 1;
+                transform: scale(1);
+            } */
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--cynex-gold);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        /* @@keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        } */
+
+        /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 12px;
+            width: 15px;
         }
 
         ::-webkit-scrollbar-track {
@@ -532,91 +941,196 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--cynex-blue-gradient);
-            border-radius: 6px;
+            background: var(--cynex-gold-gradient);
+            border-radius: 10px;
+            border: 3px solid var(--cynex-black);
         }
 
             ::-webkit-scrollbar-thumb:hover {
-                background: linear-gradient(45deg, #0D3B9E, #1F5FBF);
+                background: linear-gradient(45deg, #F9E076, #D4AF37);
             }
 
-        /* Mobile Responsive Styles */
-        .hero-title-mobile {
-            font-size: 2.5rem;
-        }
-
-        .hero-subtitle-mobile {
-            font-size: 1.2rem;
-        }
-
-        .navbar-brand-mobile {
-            font-size: 1.2rem;
-        }
-
-            .navbar-brand-mobile img {
-                height: 40px;
+        /* Responsive Design */
+        @@media (max-width: 992px) {
+            .hero-title {
+                font-size: 3.5rem;
             }
 
-        .stats-number-mobile {
-            font-size: 2rem;
+            .hero-subtitle {
+                font-size: 1.5rem;
+            }
         }
+
+        @@media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.3rem;
+            }
+
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+
+                .navbar-brand img {
+                    height: 45px;
+                }
+
+            .stats-number {
+                font-size: 3rem;
+            }
+
+            .btn-cynex-primary, .btn-cynex-secondary {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .navbar-brand {
+                font-size: 1.3rem;
+            }
+
+            .stats-number {
+                font-size: 2.5rem;
+            }
+
+            .stats-label {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Floating Elements
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        } */
+
+        @@keyframes floating {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* Glowing Effects */
+        .glow-hover {
+            transition: all 0.3s ease;
+        }
+
+            .glow-hover:hover {
+                box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+            }
+
+        /* Premium Section Divider */
+        .section-divider {
+            height: 4px;
+            background: var(--cynex-gold-gradient);
+            margin: 50px 0;
+            border-radius: 2px;
+            position: relative;
+        }
+
+            .section-divider::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 30px;
+                height: 30px;
+                background: var(--cynex-gold);
+                border-radius: 50%;
+                box-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+            }
     </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNavbar">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="~/images/Cynex Blazer.png" alt="CYNEX BLAZER Logo">
-                    <span class="cynex-font">CYNEX BLAZER</span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-home"></i> Home
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNavbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <img src="~/images/Cynex Blazer.png" alt="CYNEX BLAZER Logo">
+                <span class="cynex-font">CYNEX BLAZER</span>
+            </a><
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between" id="navbarNav">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Customer" asp-action="BrowseCars">
+                            <i class="fas fa-car"></i> Fleet
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="About">
+                            <i class="fas fa-info-circle"></i> About
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Contact">
+                            <i class="fas fa-phone"></i> Contact
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    @if (User?.Identity?.IsAuthenticated == true)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle"></i> @Context.Session.GetString("FullName")
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Customer" asp-action="BrowseCars">
-                                <i class="fas fa-car"></i> Fleet
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="About">
-                                <i class="fas fa-info-circle"></i> About
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Contact">
-                                <i class="fas fa-phone"></i> Contact
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav">
-                        @if (Context.Session.GetString("Username") != null)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user-circle"></i> @Context.Session.GetString("FullName")
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-dark">
-                                    @if (Context.Session.GetString("Role") == "Admin")
-                                    {
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                @{
+                                    var userRole = Context.Session.GetString("Role");
+                                }
+                                @switch (userRole)
+                                {
+                                    case "Admin":
+                                    case "SubAdmin":
+                                    case "Staff":
                                         <li>
                                             <a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard">
                                                 <i class="fas fa-tachometer-alt"></i> Admin Dashboard
                                             </a>
                                         </li>
-                                    }
-                                    else
-                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Admin" asp-action="ManageUsers">
+                                                <i class="fas fa-users"></i> Manage Users
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Admin" asp-action="PendingUsers">
+                                                <i class="fas fa-user-clock"></i> Pending Approvals
+                                            </a>
+                                        </li>
+                                        break;
+                                    case "Customer":
                                         <li>
                                             <a class="dropdown-item" asp-controller="Customer" asp-action="Dashboard">
-                                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                                                <i class="fas fa-tachometer-alt"></i> My Dashboard
                                             </a>
                                         </li>
                                         <li>
@@ -624,253 +1138,313 @@
                                                 <i class="fas fa-history"></i> My Bookings
                                             </a>
                                         </li>
-                                    }
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
-                                            <i class="fas fa-user-edit"></i> Profile
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
-                                            <i class="fas fa-sign-out-alt"></i> Logout
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Login">
-                                    <i class="fas fa-sign-in-alt"></i> Login
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Register">
-                                    <i class="fas fa-user-plus"></i> Register
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Customer" asp-action="BrowseCars">
+                                                <i class="fas fa-car"></i> Browse Fleet
+                                            </a>
+                                        </li>
+                                        break;
+                                    case "Driver":
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Driver" asp-action="Dashboard">
+                                                <i class="fas fa-tachometer-alt"></i> Driver Dashboard
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Driver" asp-action="MyTrips">
+                                                <i class="fas fa-road"></i> My Trips
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Driver" asp-action="ToggleAvailability">
+                                                <i class="fas fa-toggle-on"></i> Toggle Availability
+                                            </a>
+                                        </li>
+                                        break;
+                                    case "VehicleOwner":
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="VehicleOwner" asp-action="Dashboard">
+                                                <i class="fas fa-tachometer-alt"></i> Owner Dashboard
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="VehicleOwner" asp-action="MyVehicles">
+                                                <i class="fas fa-car"></i> My Vehicles
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="VehicleOwner" asp-action="Earnings">
+                                                <i class="fas fa-chart-line"></i> My Earnings
+                                            </a>
+                                        </li>
+                                        break;
+                                }
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                        <i class="fas fa-user-edit"></i> My Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
+                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Register">
+                                <i class="fas fa-user-plus"></i> Register
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<main role="main" class="pb-3">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show position-fixed" style="top: 100px; right: 20px; z-index: 9999; max-width: 400px;" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["Success"]
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 100px; right: 20px; z-index: 9999; max-width: 400px;" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @RenderBody()
+</main>
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="d-flex align-items-center mb-4">
+                    <img src="~/images/Cynex Blazer.png" alt="CYNEX BLAZER" style="height: 70px; margin-right: 15px; filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.7));">
+                    <h5 class="cynex-font mb-0">CYNEX BLAZER</h5>
+                </div>
+                <p class="mb-4">Experience the ultimate in luxury car rentals. Where performance meets prestige, and every journey becomes an unforgettable adventure.</p>
+                <div class="social-links mt-3">
+                    <a href="#" class="me-2"><i class="fab fa-facebook-f fa-2x"></i></a>
+                    <a href="#" class="me-2"><i class="fab fa-instagram fa-2x"></i></a>
+                    <a href="#" class="me-2"><i class="fab fa-twitter fa-2x"></i></a>
+                    <a href="#"><i class="fab fa-youtube fa-2x"></i></a>
                 </div>
             </div>
-        </nav>
-    </header>
-
-    <main role="main">
-        @if (TempData["Success"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show animate-fade-in position-fixed" style="top: 100px; right: 20px; z-index: 9999; max-width: 400px;" role="alert">
-                <i class="fas fa-check-circle"></i> @TempData["Success"]
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            <div class="col-md-2">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#"><i class="fas fa-angle-right me-2"></i> Our Fleet</a></li>
+                    <li class="mb-2"><a href="#"><i class="fas fa-angle-right me-2"></i> Locations</a></li>
+                    <li class="mb-2"><a href="#"><i class="fas fa-angle-right me-2"></i> Services</a></li>
+                    <li class="mb-2"><a href="#"><i class="fas fa-angle-right me-2"></i> About Us</a></li>
+                    <li class="mb-2"><a href="#"><i class="fas fa-angle-right me-2"></i> Testimonials</a></li>
+                </ul>
             </div>
-        }
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show animate-fade-in position-fixed" style="top: 100px; right: 20px; z-index: 9999; max-width: 400px;" role="alert">
-                <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            <div class="col-md-3">
+                <h5>Premium Services</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#"><i class="fas fa-angle-right me-2"></i> Luxury Car Rental</a></li>
+                    <li class="mb-2"><a href="#"><i class="fas fa-angle-right me-2"></i> Corporate Fleet</a></li>
+                    <li class="mb-2"><a href="#"><i class="fas fa-angle-right me-2"></i> Event Rentals</a></li>
+                    <li class="mb-2"><a href="#"><i class="fas fa-angle-right me-2"></i> Chauffeur Service</a></li>
+                    <li class="mb-2"><a href="#"><i class="fas fa-angle-right me-2"></i> Airport Transfers</a></li>
+                </ul>
             </div>
-        }
-        @RenderBody()
-    </main>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <img src="~/images/Cynex Blazer.png" alt="CYNEX BLAZER" style="height: 60px; margin-right: 15px;">
-                        <h5 class="cynex-font mb-0">CYNEX BLAZER</h5>
-                    </div>
-                    <p>Experience the ultimate in luxury car rentals. Where performance meets prestige, and every journey becomes an adventure.</p>
-                    <div class="social-links mt-3">
-                        <a href="#" class="me-3"><i class="fab fa-facebook-f fa-2x"></i></a>
-                        <a href="#" class="me-3"><i class="fab fa-instagram fa-2x"></i></a>
-                        <a href="#" class="me-3"><i class="fab fa-twitter fa-2x"></i></a>
-                        <a href="#"><i class="fab fa-youtube fa-2x"></i></a>
-                    </div>
+            <div class="col-md-3">
+                <h5>Contact Information</h5>
+                <div class="mb-3">
+                    <p class="d-flex align-items-center"><i class="fas fa-phone text-cynex-gold me-3"></i> <span>+1 (555) CYNEX-99</span></p>
                 </div>
-                <div class="col-md-2">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="#"><i class="fas fa-angle-right"></i> Our Fleet</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right"></i> Locations</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right"></i> Services</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right"></i> About Us</a></li>
-                    </ul>
+                <div class="mb-3">
+                    <p class="d-flex align-items-center"><i class="fas fa-envelope text-cynex-gold me-3"></i> <span>info@cynexblazer.com</span></p>
                 </div>
-                <div class="col-md-3">
-                    <h5>Services</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="#"><i class="fas fa-angle-right"></i> Luxury Car Rental</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right"></i> Corporate Fleet</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right"></i> Event Rentals</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right"></i> Chauffeur Service</a></li>
-                    </ul>
+                <div class="mb-3">
+                    <p class="d-flex align-items-center"><i class="fas fa-map-marker-alt text-cynex-gold me-3"></i> <span>123 Luxury Drive, Elite City</span></p>
                 </div>
-                <div class="col-md-3">
-                    <h5>Contact Info</h5>
-                    <p><i class="fas fa-phone text-cynex-blue"></i> +1 (555) CYNEX-99</p>
-                    <p><i class="fas fa-envelope text-cynex-blue"></i> info@cynexblazer.com</p>
-                    <p><i class="fas fa-map-marker-alt text-cynex-blue"></i> 123 Luxury Drive, Elite City</p>
-                    <p><i class="fas fa-clock text-cynex-blue"></i> 24/7 Premium Service</p>
-                </div>
-            </div>
-            <hr class="my-4" style="border-color: var(--cynex-blue);">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; 2024 CYNEX BLAZER. All rights reserved. | Luxury Redefined.</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <a href="#" class="text-cynex-silver me-3">Privacy Policy</a>
-                    <a href="#" class="text-cynex-silver me-3">Terms of Service</a>
-                    <a href="#" class="text-cynex-silver">Support</a>
+                <div class="mb-3">
+                    <p class="d-flex align-items-center"><i class="fas fa-clock text-cynex-gold me-3"></i> <span>24/7 Premium Service</span></p>
                 </div>
             </div>
         </div>
-    </footer>
-
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-
-    <script>
-        // Navbar scroll effect
-        $(window).scroll(function() {
-            if ($(window).scrollTop() > 50) {
-                $('#mainNavbar').addClass('scrolled');
+        <div class="section-divider"></div>
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="mb-0">&copy; 2024 CYNEX BLAZER. All rights reserved. | Luxury Redefined.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a href="#" class="text-cynex-silver me-3">Privacy Policy</a>
+                <a href="#" class="text-cynex-silver me-3">Terms of Service</a>
+                <a href="#" class="text-cynex-silver">Support</a>
+            </div>
+        </div>
+    </div>
+</footer>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Navbar scroll effect with enhanced animation
+        let lastScrollTop = 0;
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.scrollY || document.documentElement.scrollTop;
+            if (scrollTop > 50) {
+                document.getElementById('mainNavbar').classList.add('scrolled');
             } else {
-                $('#mainNavbar').removeClass('scrolled');
+                document.getElementById('mainNavbar').classList.remove('scrolled');
             }
+            // Direction aware navbar
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                // Scrolling down
+                document.getElementById('mainNavbar').style.transform = 'translateY(-100%)';
+            } else {
+                // Scrolling up
+                document.getElementById('mainNavbar').style.transform = 'translateY(0)';
+            }
+            lastScrollTop = scrollTop;
         });
-
         // Auto-hide alerts
         setTimeout(function() {
-            $('.alert').fadeOut('slow');
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.classList.add('fade');
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 500);
+            });
         }, 5000);
-
-        // Form enhancements
-        $('form').on('submit', function() {
-            const submitBtn = $(this).find('button[type="submit"]');
-            const originalText = submitBtn.html();
-            submitBtn.prop('disabled', true).html('<span class="loading-spinner"></span> Processing...');
-
-            setTimeout(function() {
-                submitBtn.prop('disabled', false).html(originalText);
-            }, 3000);
-        });
-
-        // Smooth scrolling
-        $('a[href^="#"]').on('click', function(event) {
-            const target = $(this.getAttribute('href'));
-            if (target.length) {
-                event.preventDefault();
-                $('html, body').stop().animate({
-                    scrollTop: target.offset().top - 100
-                }, 1000);
-            }
-        });
-
-        // Animation on scroll
-        $(window).scroll(function() {
-            $('.animate-fade-in, .animate-slide-in').each(function() {
-                var elementTop = $(this).offset().top;
-                var elementBottom = elementTop + $(this).outerHeight();
-                var viewportTop = $(window).scrollTop();
-                var viewportBottom = viewportTop + $(window).height();
-
-                if (elementBottom > viewportTop && elementTop < viewportBottom) {
-                    $(this).addClass('visible');
+        // Enhanced form submission with loading animation
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="loading-spinner"></span> Processing...';
+                    submitBtn.classList.add('btn-cynex-secondary');
+                    // Reset button after 3 seconds (in case of no response)
+                    setTimeout(function() {
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.classList.remove('btn-cynex-secondary');
+                        }
+                    }, 3000);
                 }
             });
         });
-
-        // Date validation for booking forms
-        function validateBookingDates() {
-            const pickupDate = new Date($('#PickupDate').val());
-            const returnDate = new Date($('#ReturnDate').val());
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            if (pickupDate < today) {
-                showAlert('Pickup date cannot be in the past.', 'danger');
-                return false;
-            }
-
-            if (returnDate <= pickupDate) {
-                showAlert('Return date must be after pickup date.', 'danger');
-                return false;
-            }
-
-            return true;
-        }
-
-        // Custom alert function
-        function showAlert(message, type) {
-            const alertHtml = `
-                <div class="alert alert-${type} alert-dismissible fade show animate-fade-in position-fixed"
-                     style="top: 100px; right: 20px; z-index: 9999; max-width: 400px;" role="alert">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
-                </div>
-            `;
-            $('body').append(alertHtml);
-
-            setTimeout(function() {
-                $('.alert').fadeOut('slow');
-            }, 5000);
-        }
-
+        // Animation on scroll with Intersection Observer for better performance
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        // Observe all animated elements
+        document.querySelectorAll('.animate-fade-in, .animate-slide-in, .animate-scale-in').forEach(el => {
+            observer.observe(el);
+        });
         // Calculate total cost dynamically
         function calculateTotalCost() {
-            const pickupDate = new Date($('#PickupDate').val());
-            const returnDate = new Date($('#ReturnDate').val());
-            const dailyRate = parseFloat($('#DailyRate').val()) || 0;
-
+            const pickupDateInput = document.getElementById('PickupDate');
+            const returnDateInput = document.getElementById('ReturnDate');
+            const dailyRateInput = document.getElementById('DailyRate');
+            const totalDaysElement = document.getElementById('TotalDays');
+            const totalCostElement = document.getElementById('TotalCost');
+            if (!pickupDateInput || !returnDateInput || !dailyRateInput) return;
+            const pickupDate = new Date(pickupDateInput.value);
+            const returnDate = new Date(returnDateInput.value);
+            const dailyRate = parseFloat(dailyRateInput.value) || 0;
             if (pickupDate && returnDate && returnDate > pickupDate) {
                 const timeDiff = returnDate.getTime() - pickupDate.getTime();
                 const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
                 const totalCost = daysDiff * dailyRate;
-
-                $('#TotalDays').text(daysDiff + ' day' + (daysDiff > 1 ? 's' : ''));
-                $('#TotalCost').text('$' + totalCost.toFixed(2));
+                if (totalDaysElement) {
+                    totalDaysElement.textContent = daysDiff + ' day' + (daysDiff > 1 ? 's' : '');
+                }
+                if (totalCostElement) {
+                    totalCostElement.textContent = '$' + totalCost.toFixed(2);
+                }
             }
         }
-
         // Attach event listeners for date inputs
-        $(document).on('change', '#PickupDate, #ReturnDate', calculateTotalCost);
-
-        // Enhanced form validation
-        $('input, select, textarea').on('blur', function() {
-            if ($(this).is(':invalid')) {
-                $(this).addClass('is-invalid');
+        const dateInputs = document.querySelectorAll('#PickupDate, #ReturnDate');
+        dateInputs.forEach(input => {
+            input.addEventListener('change', calculateTotalCost);
+        });
+        // Enhanced form validation with real-time feedback
+        const formElements = document.querySelectorAll('input, select, textarea');
+        formElements.forEach(element => {
+            element.addEventListener('blur', function() {
+                validateField(this);
+            });
+            element.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid')) {
+                    validateField(this);
+                }
+            });
+        });
+        function validateField(field) {
+            if (field.validity && !field.validity.valid) {
+                field.classList.add('is-invalid');
+                field.classList.remove('is-valid');
             } else {
-                $(this).removeClass('is-invalid').addClass('is-valid');
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+            }
+        }
+        // Add floating animation to selected elements
+        const floatingElements = document.querySelectorAll('.stats-card, .car-card');
+        floatingElements.forEach(el => {
+            el.classList.add('floating');
+        });
+        // Add hover glow effect to buttons and cards
+        const glowElements = document.querySelectorAll('.btn-cynex-primary, .btn-cynex-secondary, .cynex-card');
+        glowElements.forEach(el => {
+            el.classList.add('glow-hover');
+        });
+        // Parallax effect for hero section
+        window.addEventListener('mousemove', function(e) {
+            const heroSection = document.querySelector('.hero-section');
+            if (heroSection) {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                heroSection.style.transform = `translateX(${xAxis}px) translateY(${yAxis}px) scale(1.05)`;
             }
         });
+        // Add subtle pulsing animation to price tags
+        const priceTags = document.querySelectorAll('.price-tag');
+        priceTags.forEach(tag => {
+            setInterval(() => {
+                tag.style.transform = 'scale(1.05)';
+                setTimeout(() => {
 
-        // Mobile responsive handling
-        function handleMobileStyles() {
-            if (window.innerWidth <= 768) {
-                $('.hero-title').addClass('hero-title-mobile');
-                $('.hero-subtitle').addClass('hero-subtitle-mobile');
-                $('.navbar-brand').addClass('navbar-brand-mobile');
-                $('.stats-number').addClass('stats-number-mobile');
-            } else {
-                $('.hero-title').removeClass('hero-title-mobile');
-                $('.hero-subtitle').removeClass('hero-subtitle-mobile');
-                $('.navbar-brand').removeClass('navbar-brand-mobile');
-                $('.stats-number').removeClass('stats-number-mobile');
-            }
-        }
-
-        // Handle resize
-        $(window).resize(handleMobileStyles);
-        $(document).ready(handleMobileStyles);
-    </script>
-
+                    tag.style.transform = 'scale(1)';
+                }, 500);
+            }, 3000);
+        });
+    });
+</script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

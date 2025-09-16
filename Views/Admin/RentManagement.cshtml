@@ -1,0 +1,213 @@
+@using Car_Rent_System.Enums
+@model IEnumerable<Car_Rent_System.ViewModels.Booking.BookingViewModel>
+@{
+    ViewData["Title"] = "Rent Management";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="cynex-font text-cynex-silver">
+                        <i class="fas fa-handshake text-cynex-red"></i> Rent Management
+                    </h1>
+                    <p class="text-muted">Process approved bookings and manage rental transactions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="cynex-card">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background: var(--cynex-red); color: white;">
+                    <h5 class="mb-0 cynex-font">
+                        <i class="fas fa-list"></i> Approved Bookings Ready for Rent
+                    </h5>
+                    <span class="badge bg-light text-dark">@Model.Count() Ready</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead style="background: rgba(255, 0, 0, 0.1);">
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Car Details</th>
+                                        <th>Pickup Date</th>
+                                        <th>Return Date</th>
+                                        <th>Total Cost</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var booking in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-cynex-red rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-cynex-silver">@booking.CustomerName</div>
+                                                        <small class="text-muted">License: @booking.LicenseNumber</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-bold text-cynex-silver">@booking.CarName</div>
+                                                    <small class="text-muted">ID: @booking.VehicleId</small>
+                                                </div>
+                                            </td>
+                                            <td class="text-cynex-silver">@booking.PickupDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="text-cynex-silver">@booking.ReturnDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="fw-bold text-cynex-red">$@booking.TotalCost.ToString("F2")</td>
+                                            <td>
+                                                <button class="btn btn-primary" onclick="processRent(@booking.Id)" title="Process Rent">
+                                                    <i class="fas fa-handshake"></i> Process Rent
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-handshake fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No approved bookings</h5>
+                            <p class="text-muted">Approved bookings ready for rent will appear here.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rent Processing Modal -->
+<div class="modal fade" id="rentModal" tabindex="-1" aria-labelledby="rentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--cynex-red); color: white;">
+                <h5 class="modal-title cynex-font" id="rentModalLabel">
+                    <i class="fas fa-handshake"></i> Process Rent
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="rentForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Pickup Date</label>
+                            <input type="date" id="pickupDate" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Odometer Start Reading (km) *</label>
+                            <input type="number" id="odometerStart" class="form-control" required min="0">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Payment Method *</label>
+                            <select id="paymentMethod" class="form-control" required>
+                                <option value="">Select payment method</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Credit Card">Credit Card</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Partial Payment Amount ($)</label>
+                            <input type="number" id="partialPayment" class="form-control" step="0.01" min="0">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rent Calculation</label>
+                        <div class="alert alert-info">
+                            <div id="rentCalculation">
+                                <!-- Calculation will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="confirmRent()">
+                    <i class="fas fa-check"></i> Confirm Rent
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function processRent(bookingId) {
+            $('#rentModal').modal('show');
+            $('#rentModal').data('booking-id', bookingId);
+            
+            // Load booking details and populate form
+            loadBookingDetails(bookingId);
+        }
+
+        function loadBookingDetails(bookingId) {
+            // This would typically load booking details via AJAX
+            // For now, we'll show a placeholder
+            $('#rentCalculation').html(`
+                <p><strong>Total Cost:</strong> $0.00</p>
+                <p><strong>Advance Payment (50%):</strong> $0.00</p>
+                <p><strong>Remaining Amount:</strong> $0.00</p>
+            `);
+        }
+
+        function confirmRent() {
+            const bookingId = $('#rentModal').data('booking-id');
+            const odometerStart = $('#odometerStart').val();
+            const paymentMethod = $('#paymentMethod').val();
+            const partialPayment = $('#partialPayment').val();
+
+            if (!odometerStart || !paymentMethod) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            if (confirm('Are you sure you want to process this rent?')) {
+                // AJAX call to process rent
+                fetch('/Admin/ProcessRent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        bookingId: bookingId,
+                        odometerStartReading: parseInt(odometerStart),
+                        paymentMethod: paymentMethod,
+                        partialPayment: parseFloat(partialPayment) || 0
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        $('#rentModal').modal('hide');
+                        location.reload();
+                    } else {
+                        alert('Error processing rent: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while processing the rent.');
+                });
+            }
+        }
+    </script>
+}

@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="cynex-card p-5 text-center">
+                <div class="mb-4">
+                    <div class="spinner-border text-cynex-red" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3">Redirecting to secure payment...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const stripe = Stripe('@ViewBag.StripePublishableKey');
+            stripe.redirectToCheckout({
+                sessionId: '@ViewBag.SessionId'
+            }).then(function (result) {
+                if (result.error) {
+                    alert('Payment error: ' + result.error.message);
+                    window.location.href = '/Customer/BrowseCars';
+                }
+            });
+        });
+    </script>
+}
