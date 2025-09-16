@@ -12,7 +12,13 @@ namespace Car_Rent_System.Services
         public StripeService(IConfiguration config)
         {
             _config = config;
-            StripeConfiguration.ApiKey = _config["Stripe:SecretKey"];
+            var envSecret = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
+            var secret = string.IsNullOrWhiteSpace(envSecret) ? _config["Stripe:SecretKey"] : envSecret;
+            if (string.IsNullOrWhiteSpace(secret))
+            {
+                throw new InvalidOperationException("Stripe secret key is not configured. Set STRIPE_SECRET_KEY in .env or Stripe:SecretKey in appsettings.");
+            }
+            StripeConfiguration.ApiKey = secret;
         }
 
         public async Task<string> CreateCheckoutSessionAsync(BookingDto bookingDto, string carName)
