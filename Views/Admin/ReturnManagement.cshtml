@@ -1,0 +1,248 @@
+@using Car_Rent_System.Enums
+@model IEnumerable<Car_Rent_System.ViewModels.Booking.BookingViewModel>
+@{
+    ViewData["Title"] = "Return Management";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="cynex-font text-cynex-silver">
+                        <i class="fas fa-undo text-cynex-red"></i> Return Management
+                    </h1>
+                    <p class="text-muted">Process car returns and manage payment settlements</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="cynex-card">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background: var(--cynex-red); color: white;">
+                    <h5 class="mb-0 cynex-font">
+                        <i class="fas fa-list"></i> Active Rentals Ready for Return
+                    </h5>
+                    <span class="badge bg-light text-dark">@Model.Count() Active</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead style="background: rgba(255, 0, 0, 0.1);">
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Car Details</th>
+                                        <th>Pickup Date</th>
+                                        <th>Expected Return</th>
+                                        <th>Odometer Start</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var booking in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-cynex-red rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-cynex-silver">@booking.CustomerName</div>
+                                                        <small class="text-muted">License: @booking.LicenseNumber</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-bold text-cynex-silver">@booking.CarName</div>
+                                                    <small class="text-muted">ID: @booking.VehicleId</small>
+                                                </div>
+                                            </td>
+                                            <td class="text-cynex-silver">@booking.PickupDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="text-cynex-silver">@booking.ReturnDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="text-cynex-silver">@(booking.OdometerStartReading?.ToString() ?? "N/A") km</td>
+                                            <td>
+                                                <button class="btn btn-warning" onclick="processReturn(@booking.Id)" title="Process Return">
+                                                    <i class="fas fa-undo"></i> Process Return
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-undo fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No active rentals</h5>
+                            <p class="text-muted">Active rentals ready for return will appear here.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Return Processing Modal -->
+<div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--cynex-red); color: white;">
+                <h5 class="modal-title cynex-font" id="returnModalLabel">
+                    <i class="fas fa-undo"></i> Process Return
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="returnForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Pickup Date</label>
+                            <input type="date" id="pickupDate" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Manual Return Date *</label>
+                            <input type="date" id="returnDate" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Odometer Start Reading (km)</label>
+                            <input type="number" id="odometerStart" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Odometer End Reading (km) *</label>
+                            <input type="number" id="odometerEnd" class="form-control" required min="0">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Payment Summary</label>
+                        <div class="alert alert-info">
+                            <div id="paymentSummary">
+                                <!-- Payment summary will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Balance Amount to be Paid ($)</label>
+                            <input type="number" id="balanceAmount" class="form-control" step="0.01" min="0" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Payment Status</label>
+                            <select id="paymentStatus" class="form-control">
+                                <option value="Paid">Paid in Full</option>
+                                <option value="Partial">Partial Payment</option>
+                                <option value="Pending">Payment Pending</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="confirmReturn()">
+                    <i class="fas fa-check"></i> Complete Return
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function processReturn(bookingId) {
+            $('#returnModal').modal('show');
+            $('#returnModal').data('booking-id', bookingId);
+            
+            // Load booking details and populate form
+            loadReturnDetails(bookingId);
+        }
+
+        function loadReturnDetails(bookingId) {
+            // This would typically load booking details via AJAX
+            // For now, we'll show a placeholder
+            $('#paymentSummary').html(`
+                <p><strong>Pickup Date:</strong> <span id="pickupDateDisplay">-</span></p>
+                <p><strong>Return Date:</strong> <span id="returnDateDisplay">-</span></p>
+                <p><strong>Distance Traveled:</strong> <span id="distanceDisplay">-</span> km</p>
+                <p><strong>Total Amount:</strong> $<span id="totalAmountDisplay">0.00</span></p>
+                <p><strong>Advance Payment:</strong> $<span id="advancePaymentDisplay">0.00</span></p>
+                <p><strong>Balance Amount:</strong> $<span id="balanceAmountDisplay">0.00</span></p>
+            `);
+        }
+
+        function confirmReturn() {
+            const bookingId = $('#returnModal').data('booking-id');
+            const returnDate = $('#returnDate').val();
+            const odometerEnd = $('#odometerEnd').val();
+            const paymentStatus = $('#paymentStatus').val();
+
+            if (!returnDate || !odometerEnd) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            if (confirm('Are you sure you want to complete this return?')) {
+                // AJAX call to process return
+                fetch('/Admin/ProcessReturn', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        bookingId: bookingId,
+                        returnDate: returnDate,
+                        odometerEndReading: parseInt(odometerEnd),
+                        paymentStatus: paymentStatus
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        $('#returnModal').modal('hide');
+                        location.reload();
+                    } else {
+                        alert('Error processing return: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while processing the return.');
+                });
+            }
+        }
+
+        // Calculate balance when odometer end reading changes
+        $('#odometerEnd').on('input', function() {
+            const startReading = parseInt($('#odometerStart').val()) || 0;
+            const endReading = parseInt($(this).val()) || 0;
+            const distance = endReading - startReading;
+            
+            if (distance >= 0) {
+                // Update distance display
+                $('#distanceDisplay').text(distance.toLocaleString());
+                
+                // Calculate costs (this would typically come from the booking data)
+                const perKmRate = 2.50; // This should come from the car's per km rate
+                const totalAmount = distance * perKmRate;
+                const advancePayment = totalAmount * 0.5;
+                const balanceAmount = totalAmount - advancePayment;
+                
+                $('#totalAmountDisplay').text(totalAmount.toFixed(2));
+                $('#advancePaymentDisplay').text(advancePayment.toFixed(2));
+                $('#balanceAmountDisplay').text(balanceAmount.toFixed(2));
+                $('#balanceAmount').val(balanceAmount.toFixed(2));
+            }
+        });
+    </script>
+}

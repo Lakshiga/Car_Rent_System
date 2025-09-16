@@ -1,7 +1,8 @@
-﻿@model IEnumerable<Car_Rent_System.Models.Booking>
-
+﻿@using Car_Rent_System.Enums
+@model IEnumerable<Car_Rent_System.ViewModels.Booking.BookingViewModel>
 @{
     ViewData["Title"] = "Customer Dashboard";
+    Layout = "_CustomerLayout";
 }
 
 <div class="container-fluid">
@@ -9,14 +10,14 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h1 class="display-6 fw-bold">
-                        <i class="fas fa-tachometer-alt"></i> Welcome, @Context.Session.GetString("FullName")!
+                    <h1 class="cynex-font text-cynex-silver display-5">
+                        <i class="fas fa-tachometer-alt text-cynex-red"></i> CUSTOMER DASHBOARD
                     </h1>
-                    <p class="text-muted">Manage your bookings and explore our car collection</p>
+                    <p class="text-muted">Welcome back, @Context.Session.GetString("FullName")! Manage your luxury experience.</p>
                 </div>
                 <div>
-                    <a asp-action="BrowseCars" class="btn btn-primary">
-                        <i class="fas fa-car"></i> Browse Cars
+                    <a asp-action="BrowseCars" class="btn btn-cynex-primary">
+                        <i class="fas fa-car"></i> BROWSE FLEET
                     </a>
                 </div>
             </div>
@@ -26,55 +27,71 @@
     <!-- Statistics Cards -->
     <div class="row g-4 mb-5">
         <div class="col-lg-3 col-md-6">
-            <div class="dashboard-card">
+            <div class="stats-card">
                 <div class="d-flex align-items-center">
-                    <div class="dashboard-icon me-3">
+                    <div class="stats-icon me-3">
                         <i class="fas fa-calendar-check"></i>
                     </div>
                     <div>
-                        <h3 class="fw-bold mb-0">@ViewBag.TotalBookings</h3>
-                        <p class="mb-0">Total Bookings</p>
+                        <h3 class="stats-number">@ViewBag.TotalBookings</h3>
+                        <p class="stats-label">Total Bookings</p>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-3 col-md-6">
-            <div class="dashboard-card">
+            <div class="stats-card">
                 <div class="d-flex align-items-center">
-                    <div class="dashboard-icon me-3">
+                    <div class="stats-icon me-3">
                         <i class="fas fa-dollar-sign"></i>
                     </div>
                     <div>
-                        <h3 class="fw-bold mb-0">$@ViewBag.TotalSpent</h3>
-                        <p class="mb-0">Total Spent</p>
+                        <h3 class="stats-number">$@ViewBag.TotalSpent</h3>
+                        <p class="stats-label">Total Spent</p>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-3 col-md-6">
-            <div class="dashboard-card">
+            <div class="stats-card">
                 <div class="d-flex align-items-center">
-                    <div class="dashboard-icon me-3">
+                    <div class="stats-icon me-3">
                         <i class="fas fa-star"></i>
                     </div>
                     <div>
-                        <h3 class="fw-bold mb-0">4.8</h3>
-                        <p class="mb-0">Your Rating</p>
+                        <h3 class="stats-number">4.8</h3>
+                        <p class="stats-label">Your Rating</p>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-3 col-md-6">
-            <div class="dashboard-card">
+            <div class="stats-card">
                 <div class="d-flex align-items-center">
-                    <div class="dashboard-icon me-3">
+                    <div class="stats-icon me-3">
                         <i class="fas fa-trophy"></i>
                     </div>
                     <div>
-                        <h3 class="fw-bold mb-0">Gold</h3>
-                        <p class="mb-0">Member Status</p>
+                        <h3 class="stats-number">Gold</h3>
+                        <p class="stats-label">Member Status</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Charts -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+            <div class="cynex-card p-4">
+                <h5 class="text-cynex-blue mb-4">Your Spending Over Time</h5>
+                <canvas id="spendingChart" height="300"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="cynex-card p-4">
+                <h5 class="text-cynex-blue mb-4">Your Car Preferences</h5>
+                <canvas id="preferencesChart" height="300"></canvas>
             </div>
         </div>
     </div>
@@ -82,36 +99,34 @@
     <!-- Quick Actions -->
     <div class="row g-4 mb-5">
         <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title fw-bold mb-4">
-                        <i class="fas fa-bolt"></i> Quick Actions
-                    </h5>
-                    <div class="row g-3">
-                        <div class="col-lg-3 col-md-6">
-                            <a asp-action="BrowseCars" class="btn btn-outline-primary w-100 py-3">
-                                <i class="fas fa-search fa-2x mb-2 d-block"></i>
-                                Browse Cars
-                            </a>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <a asp-action="BookingHistory" class="btn btn-outline-success w-100 py-3">
-                                <i class="fas fa-history fa-2x mb-2 d-block"></i>
-                                My Bookings
-                            </a>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <a asp-controller="Account" asp-action="Profile" class="btn btn-outline-info w-100 py-3">
-                                <i class="fas fa-user-edit fa-2x mb-2 d-block"></i>
-                                Edit Profile
-                            </a>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <a href="#" class="btn btn-outline-warning w-100 py-3">
-                                <i class="fas fa-headset fa-2x mb-2 d-block"></i>
-                                Support
-                            </a>
-                        </div>
+            <div class="cynex-card p-4">
+                <h5 class="cynex-font text-cynex-silver mb-4">
+                    <i class="fas fa-bolt text-cynex-red"></i> QUICK ACTIONS
+                </h5>
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <a asp-action="BrowseCars" class="btn btn-outline-primary w-100 py-3">
+                            <i class="fas fa-search fa-2x mb-2 d-block"></i>
+                            Browse Cars
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a asp-action="BookingHistory" class="btn btn-outline-success w-100 py-3">
+                            <i class="fas fa-history fa-2x mb-2 d-block"></i>
+                            My Bookings
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a asp-controller="Account" asp-action="Profile" class="btn btn-outline-info w-100 py-3">
+                            <i class="fas fa-user-edit fa-2x mb-2 d-block"></i>
+                            Edit Profile
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a href="#" class="btn btn-outline-warning w-100 py-3">
+                            <i class="fas fa-headset fa-2x mb-2 d-block"></i>
+                            Support
+                        </a>
                     </div>
                 </div>
             </div>
@@ -121,21 +136,21 @@
     <!-- Recent Bookings -->
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-clock"></i> Recent Bookings
+            <div class="cynex-card">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background: var(--cynex-red); color: white;">
+                    <h5 class="mb-0 cynex-font">
+                        <i class="fas fa-clock"></i> RECENT BOOKINGS
                     </h5>
-                    <a asp-action="BookingHistory" class="btn btn-sm btn-outline-primary">
+                    <a asp-action="BookingHistory" class="btn btn-sm btn-light">
                         View All <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     @if (Model.Any())
                     {
                         <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="table-light">
+                            <table class="table table-hover mb-0">
+                                <thead style="background: rgba(255, 0, 0, 0.1);">
                                     <tr>
                                         <th>Car</th>
                                         <th>Pickup Date</th>
@@ -151,35 +166,34 @@
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <img src="~/images/Lambogini.jpg" class="car-image" alt="BMW M5 Competition
-                                                         class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;" alt="Car">
+                                                    <img src="@booking.Car?.ImageUrl" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;" alt="Car">
                                                     <div>
-                                                        <div class="fw-bold">@booking.Car.CarName</div>
-                                                        <small class="text-muted">@booking.Car.CarModel</small>
+                                                        <div class="fw-bold text-cynex-silver">@booking.Car?.CarName</div>
+                                                        <small class="text-muted">@booking.Car?.Model</small>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>@booking.PickupDate.ToString("MMM dd, yyyy")</td>
-                                            <td>@booking.ReturnDate.ToString("MMM dd, yyyy")</td>
-                                            <td class="fw-bold">$@booking.TotalCost</td>
+                                            <td class="text-cynex-silver">@booking.PickupDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="text-cynex-silver">@booking.ReturnDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="fw-bold text-cynex-red">$@booking.TotalCost.ToString("F2")</td>
                                             <td>
-                                                @if (booking.BookingStatus == "Confirmed")
+                                                @switch (booking.BookingStatus)
                                                 {
-                                                    <span class="badge bg-success">@booking.BookingStatus</span>
-                                                }
-                                                else if (booking.BookingStatus == "Cancelled")
-                                                {
-                                                    <span class="badge bg-danger">@booking.BookingStatus</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge bg-primary">@booking.BookingStatus</span>
+                                                    case BookingStatus.Confirmed:
+                                                        <span class="badge bg-success">Confirmed</span>
+                                                        break;
+                                                    case BookingStatus.Cancelled:
+                                                        <span class="badge bg-danger">Cancelled</span>
+                                                        break;
+                                                    default:
+                                                        <span class="badge bg-primary">@booking.BookingStatus.ToString()</span>
+                                                        break;
                                                 }
                                             </td>
                                             <td>
-                                                @if (booking.BookingStatus == "Confirmed" && booking.PickupDate > DateTime.Today)
+                                                @if (booking.BookingStatus == BookingStatus.Confirmed && booking.PickupDate > DateTime.Today)
                                                 {
-                                                    <button class="btn btn-sm btn-outline-danger" onclick="cancelBooking(@booking.BookingID)">
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="cancelBooking(@booking.Id)">
                                                         <i class="fas fa-times"></i> Cancel
                                                     </button>
                                                 }
@@ -200,8 +214,8 @@
                             <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
                             <h5 class="text-muted">No bookings yet</h5>
                             <p class="text-muted">Start exploring our amazing car collection!</p>
-                            <a asp-action="BrowseCars" class="btn btn-primary">
-                                <i class="fas fa-car"></i> Browse Cars
+                            <a asp-action="BrowseCars" class="btn btn-cynex-primary">
+                                <i class="fas fa-car"></i> BROWSE CARS
                             </a>
                         </div>
                     }
@@ -212,7 +226,86 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Spending Chart
+            const spendingData = @Html.Raw(Json.Serialize(ViewBag.MonthlySpending));
+            const spendingCtx = document.getElementById('spendingChart').getContext('2d');
+            new Chart(spendingCtx, {
+                type: 'line',
+                data: {
+                    labels: spendingData.map(item => item.month),
+                    datasets: [{
+                        label: 'Monthly Spending ($)',
+                        data: spendingData.map(item => item.amount),
+                        borderColor: '#0A2472',
+                        backgroundColor: 'rgba(10, 36, 114, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#C0C0C0'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#C0C0C0'
+                            },
+                            grid: {
+                                color: 'rgba(192, 192, 192, 0.2)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#C0C0C0'
+                            },
+                            grid: {
+                                color: 'rgba(192, 192, 192, 0.2)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Preferences Chart
+            const preferencesData = @Html.Raw(Json.Serialize(ViewBag.CarPreferences));
+            const preferencesCtx = document.getElementById('preferencesChart').getContext('2d');
+            new Chart(preferencesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: preferencesData.map(item => item.carType),
+                    datasets: [{
+                        data: preferencesData.map(item => item.count),
+                        backgroundColor: [
+                            '#0A2472', '#FF5733', '#33FF57', '#3357FF', '#F3FF33'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#000000'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#C0C0C0'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
         function cancelBooking(bookingId) {
             if (confirm('Are you sure you want to cancel this booking?')) {
                 $.post('@Url.Action("CancelBooking", "Customer")', { id: bookingId })
@@ -220,9 +313,70 @@
                         location.reload();
                     })
                     .fail(function() {
-                        alert('Error cancelling booking. Please try again.');
+                        showAlert('Error cancelling booking. Please try again.', 'danger');
                     });
             }
         }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style = 'top: 100px; right: 20px; z-index: 9999; max-width: 400px;';
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(function() {
+                alertDiv.remove();
+            }, 5000);
+        }
     </script>
 }
+
+<style>
+    .stats-card {
+        background: rgba(0, 0, 0, 0.9);
+        border: 2px solid var(--cynex-red);
+        border-radius: 15px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(255, 0, 0, 0.3);
+        }
+
+    .stats-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--cynex-red-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .stats-number {
+        font-family: 'Orbitron', monospace;
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--cynex-silver);
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-label {
+        color: var(--cynex-silver);
+        font-size: 1rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0;
+    }
+</style>

@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Car_Rent_System.Models;
-
+using Car_Rent_System.Enums;
 
 namespace Car_Rent_System.Models
 {
@@ -11,52 +10,70 @@ namespace Car_Rent_System.Models
         public int BookingID { get; set; }
 
         [Required]
-        [ForeignKey("Customer")]
-        public int CustomerID { get; set; }
+        public string CustomerID { get; set; } = string.Empty;
 
         [Required]
-        [ForeignKey("Car")]
         public int CarID { get; set; }
 
-        [Required(ErrorMessage = "Pickup date is required")]
-        [Display(Name = "Pickup Date")]
-        [DataType(DataType.Date)]
+        [Required]
         public DateTime PickupDate { get; set; }
 
-        [Required(ErrorMessage = "Return date is required")]
-        [Display(Name = "Return Date")]
-        [DataType(DataType.Date)]
+        [Required]
         public DateTime ReturnDate { get; set; }
 
-        [Column(TypeName = "decimal(10,2)")]
-        [Display(Name = "Total Cost")]
+        public DateTime BookingDate { get; set; } = DateTime.UtcNow;
+
+        [Column(TypeName = "decimal(18,2)")]
         public decimal TotalCost { get; set; }
 
-        [StringLength(20)]
-        [Display(Name = "Booking Status")]
-        public string BookingStatus { get; set; } = "Confirmed";
+        public BookingStatus BookingStatus { get; set; } = BookingStatus.Pending;
 
-        [Display(Name = "Booking Date")]
-        public DateTime BookingDate { get; set; } = DateTime.Now;
+        public string PickupLocation { get; set; } = string.Empty;
+
+        public string? ReturnLocation { get; set; }
 
         [StringLength(500)]
-        [Display(Name = "Special Requirements")]
-        public string SpecialRequirements { get; set; }
+        public string? SpecialRequirements { get; set; }
+        public string? StripeSessionId { get; set; }
 
-        [Display(Name = "Pickup Location")]
-        [StringLength(200)]
-        public string PickupLocation { get; set; }
+        // New booking details for enhanced flow
+        [StringLength(50)]
+        public string? LicenseNumber { get; set; }
 
-        [Display(Name = "Return Location")]
-        [StringLength(200)]
-        public string ReturnLocation { get; set; }
+        [StringLength(20)]
+        public string? NICNumber { get; set; }
+
+        [StringLength(500)]
+        public string? DocumentImageUrl { get; set; }
+
+        [StringLength(500)]
+        public string? LicenseImageFrontUrl { get; set; }
+
+        [StringLength(500)]
+        public string? LicenseImageBackUrl { get; set; }
+
+        public int? OdometerStartReading { get; set; }
+
+        public int? OdometerEndReading { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? DistanceTraveled { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? PerKilometerRate { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? AdvancePayment { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? RemainingAmount { get; set; }
 
         // Navigation properties
-        public virtual User Customer { get; set; }
-        public virtual Car Car { get; set; }
+        [ForeignKey("CustomerID")]
+        public virtual ApplicationUser Customer { get; set; } = null!;
 
-        // Calculated property
-        [NotMapped]
-        public int TotalDays => (ReturnDate - PickupDate).Days + 1;
+        [ForeignKey("CarID")]
+        public virtual Car Car { get; set; } = null!;
+        public bool WithDriver { get; set; } = false;
     }
 }

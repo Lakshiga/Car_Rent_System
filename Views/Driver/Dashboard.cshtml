@@ -1,0 +1,36 @@
+﻿@model Car_Rent_System.Models.Driver
+@{
+    ViewData["Title"] = "Driver Dashboard";
+}
+
+<div class="container mt-4">
+    <h2>Welcome, @ViewData["DriverName"]!</h2>
+    <p>Manage your trips, vehicle, and availability.</p>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Assigned Trips</h5>
+                    <a asp-action="Trips" class="btn btn-primary">View</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Current Vehicle</h5>
+                    <a asp-action="Vehicle" class="btn btn-success">View</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Set Availability</h5>
+                    <a asp-action="Schedule" class="btn btn-warning">Update</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

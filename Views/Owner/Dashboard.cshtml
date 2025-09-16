@@ -1,0 +1,90 @@
+﻿@model Car_Rent_System.ViewModels.Owner.DashboardViewModel
+@{
+    ViewData["Title"] = "Owner Dashboard";
+}
+
+<div class="container mt-4">
+    <h2>Welcome, @Model.BusinessName!</h2>
+    <p>Manage your fleet, view reports, and oversee your team.</p>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center bg-primary text-white">
+                <div class="card-body">
+                    <h5>Total Vehicles</h5>
+                    <p class="display-6">@Model.TotalVehicles</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-success text-white">
+                <div class="card-body">
+                    <h5>Active Rentals</h5>
+                    <p class="display-6">@Model.ActiveRentals</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-info text-white">
+                <div class="card-body">
+                    <h5>Monthly Earnings</h5>
+                    <p class="display-6">$@Model.MonthlyEarnings</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-warning text-white">
+                <div class="card-body">
+                    <h5>Drivers</h5>
+                    <p class="display-6">@Model.TotalDrivers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Fleet Management</h5>
+                    <a asp-action="Fleet" class="btn btn-success">Manage</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Financial Reports</h5>
+                    <a asp-action="Reports" class="btn btn-info">View</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Staff & Drivers</h5>
+                    <a asp-action="Team" class="btn btn-warning">Manage</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>My Vehicles</h4>
+    <div class="row">
+        @foreach (var car in Model.Cars)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="@car.ImageUrl" class="card-img-top" alt="@car.DisplayName" style="height: 150px; object-fit: cover;" />
+                    <div class="card-body">
+                        <h6>@car.DisplayName</h6>
+                        <p><strong>Rate:</strong> $@car.DailyRate/day</p>
+                        <span class="badge @(car.IsAvailable ? "bg-success" : "bg-danger")">
+                            @(car.IsAvailable ? "Available" : "Rented")
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

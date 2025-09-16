@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CYNEX BLAZER</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Car_Rent_System.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="customer-container">
+        <!-- Sidebar -->
+        <nav class="customer-sidebar">
+            <div class="sidebar-header">
+                <h4 class="cynex-font text-cynex-silver">
+                    <i class="fas fa-user-circle text-cynex-red"></i> CYNEX BLAZER
+                </h4>
+                <p class="text-muted small">Customer Portal</p>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a asp-controller="Customer" asp-action="Dashboard" class="menu-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a asp-controller="Customer" asp-action="BrowseCars" class="menu-link">
+                        <i class="fas fa-car"></i>
+                        <span>Browse Cars</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a asp-controller="Customer" asp-action="BookingHistory" class="menu-link">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>My Bookings</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a asp-controller="Customer" asp-action="RentalHistory" class="menu-link">
+                        <i class="fas fa-handshake"></i>
+                        <span>Rental History</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a asp-controller="Customer" asp-action="ReturnHistory" class="menu-link">
+                        <i class="fas fa-undo"></i>
+                        <span>Return History</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a asp-controller="Customer" asp-action="PaymentHistory" class="menu-link">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Payment History</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a asp-controller="Home" asp-action="Index" class="menu-link">
+                        <i class="fas fa-home"></i>
+                        <span>Public Website</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="customer-main">
+            <!-- Top Navigation -->
+            <header class="customer-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">@ViewData["Title"]</h1>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <span class="welcome-text">Welcome, @Context.Session.GetString("FullName")</span>
+                        <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="customer-content">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle"></i> @TempData["Success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    <script>
+        // Sidebar toggle functionality
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.querySelector('.customer-sidebar').classList.toggle('collapsed');
+            document.querySelector('.customer-main').classList.toggle('expanded');
+        });
+
+        // Active menu item highlighting
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.menu-link').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+<style>
+    .customer-container {
+        display: flex;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    }
+
+    .customer-sidebar {
+        width: 250px;
+        background: rgba(0, 0, 0, 0.95);
+        border-right: 2px solid var(--cynex-red);
+        transition: all 0.3s ease;
+        position: fixed;
+        height: 100vh;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+
+    .customer-sidebar.collapsed {
+        width: 70px;
+    }
+
+    .customer-sidebar.collapsed .sidebar-header h4,
+    .customer-sidebar.collapsed .sidebar-header p,
+    .customer-sidebar.collapsed .menu-link span {
+        display: none;
+    }
+
+    .sidebar-header {
+        padding: 2rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 0, 0, 0.2);
+        text-align: center;
+    }
+
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .menu-item {
+        margin: 0;
+    }
+
+    .menu-link {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        color: var(--cynex-silver);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .menu-link:hover {
+        background: rgba(255, 0, 0, 0.1);
+        color: var(--cynex-red);
+        border-left-color: var(--cynex-red);
+    }
+
+    .menu-link.active {
+        background: rgba(255, 0, 0, 0.2);
+        color: var(--cynex-red);
+        border-left-color: var(--cynex-red);
+    }
+
+    .menu-link i {
+        width: 20px;
+        margin-right: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .customer-main {
+        flex: 1;
+        margin-left: 250px;
+        transition: all 0.3s ease;
+    }
+
+    .customer-main.expanded {
+        margin-left: 70px;
+    }
+
+    .customer-header {
+        background: rgba(0, 0, 0, 0.9);
+        border-bottom: 2px solid var(--cynex-red);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+    }
+
+    .sidebar-toggle {
+        background: none;
+        border: none;
+        color: var(--cynex-silver);
+        font-size: 1.2rem;
+        margin-right: 1rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+        color: var(--cynex-red);
+    }
+
+    .page-title {
+        color: var(--cynex-silver);
+        font-family: 'Orbitron', monospace;
+        font-weight: 700;
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .welcome-text {
+        color: var(--cynex-silver);
+        font-weight: 500;
+    }
+
+    .customer-content {
+        padding: 2rem;
+        min-height: calc(100vh - 80px);
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .customer-sidebar {
+            transform: translateX(-100%);
+        }
+
+        .customer-sidebar.show {
+            transform: translateX(0);
+        }
+
+        .customer-main {
+            margin-left: 0;
+        }
+
+        .customer-content {
+            padding: 1rem;
+        }
+    }
+</style>

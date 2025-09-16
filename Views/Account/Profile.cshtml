@@ -1,0 +1,242 @@
+﻿@model Car_Rent_System.DTOs.ProfileDto
+@{
+    ViewData["Title"] = "Edit Profile";
+    var userRole = Context.Session.GetString("Role");
+    var isDriver = userRole == "Driver";
+    var isOwner = userRole == "VehicleOwner";
+}
+
+<div class="container-fluid" style="padding-top: 100px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="cynex-card p-5">
+                <div class="text-center mb-5">
+                    <h2 class="cynex-font text-cynex-silver mb-3">
+                        <i class="fas fa-user-edit text-cynex-red"></i> EDIT YOUR PROFILE
+                    </h2>
+                    <p class="text-muted">Update your personal information and preferences</p>
+                </div>
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <i class="fas fa-check-circle"></i> @TempData["Success"]
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <form asp-action="Profile" method="post" enctype="multipart/form-data" id="profileForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="FirstName" class="form-label">
+                                <i class="fas fa-user text-cynex-red"></i> First Name *
+                            </label>
+                            <input asp-for="FirstName" class="form-control" required>
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="LastName" class="form-label">
+                                <i class="fas fa-user text-cynex-red"></i> Last Name *
+                            </label>
+                            <input asp-for="LastName" class="form-control" required>
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Email" class="form-label">
+                                <i class="fas fa-envelope text-cynex-red"></i> Email *
+                            </label>
+                            <input asp-for="Email" class="form-control" required readonly>
+                            <small class="text-muted">Email cannot be changed for security reasons</small>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="PhoneNumber" class="form-label">
+                                <i class="fas fa-phone text-cynex-red"></i> Phone Number
+                            </label>
+                            <input asp-for="PhoneNumber" class="form-control" type="tel">
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Address" class="form-label">
+                            <i class="fas fa-map-marker-alt text-cynex-red"></i> Address
+                        </label>
+                        <textarea asp-for="Address" class="form-control" rows="3" placeholder="Enter your full address"></textarea>
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+
+                    @if (isDriver)
+                    {
+                        <div class="mb-4">
+                            <label asp-for="LicenseNumber" class="form-label">
+                                <i class="fas fa-id-card text-cynex-red"></i> Driver's License Number *
+                            </label>
+                            <input asp-for="LicenseNumber" class="form-control" required>
+                            <span asp-validation-for="LicenseNumber" class="text-danger"></span>
+                        </div>
+                    }
+
+                    @if (isOwner)
+                    {
+                        <div class="mb-4">
+                            <label asp-for="CompanyName" class="form-label">
+                                <i class="fas fa-building text-cynex-red"></i> Company Name *
+                            </label>
+                            <input asp-for="CompanyName" class="form-control" required>
+                            <span asp-validation-for="CompanyName" class="text-danger"></span>
+                        </div>
+                    }
+
+                    <div class="mb-4">
+                        <label asp-for="ImageFile" class="form-label">
+                            <i class="fas fa-image text-cynex-red"></i> Profile Picture
+                        </label>
+                        <input asp-for="ImageFile" type="file" class="form-control" accept="image/*">
+                        <small class="text-muted">Upload a professional photo (JPG, PNG, max 5MB)</small>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-eye text-cynex-red"></i> Current Profile Picture
+                            </label>
+                            <div class="text-center">
+                                <img src="@Model.ImageUrl" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid var(--cynex-red);">
+                            </div>
+                        </div>
+                    }
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-cynex-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-cynex-primary btn-lg">
+                            <i class="fas fa-save"></i> SAVE CHANGES
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form validation
+            document.getElementById('profileForm').addEventListener('submit', function(e) {
+                const requiredFields = ['FirstName', 'LastName'];
+
+                if (@(isDriver.ToString().ToLower())) {
+                    requiredFields.push('LicenseNumber');
+                }
+
+                if (@(isOwner.ToString().ToLower())) {
+                    requiredFields.push('CompanyName');
+                }
+
+                let isValid = true;
+
+                requiredFields.forEach(function(fieldName) {
+                    const field = document.querySelector(`[name="${fieldName}"]`);
+                    if (!field.value.trim()) {
+                        field.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        field.classList.remove('is-invalid');
+                        field.classList.add('is-valid');
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    showAlert('Please fill in all required fields.', 'danger');
+                }
+            });
+
+            // Real-time validation
+            document.querySelectorAll('input, textarea').forEach(function(field) {
+                field.addEventListener('blur', function() {
+                    if (this.hasAttribute('required') && !this.value.trim()) {
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-invalid');
+                        if (this.value.trim()) {
+                            this.classList.add('is-valid');
+                        }
+                    }
+                });
+            });
+
+            function showAlert(message, type) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                alertDiv.style = 'top: 100px; right: 20px; z-index: 9999; max-width: 400px;';
+                alertDiv.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                `;
+                document.body.appendChild(alertDiv);
+
+                setTimeout(function() {
+                    alertDiv.remove();
+                }, 5000);
+            }
+        });
+    </script>
+}
+
+<style>
+    .cynex-card {
+        background: rgba(0, 0, 0, 0.9);
+        border: 1px solid rgba(192, 192, 192, 0.2);
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        padding: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control {
+        background: rgba(0, 0, 0, 0.8);
+        border: 2px solid rgba(192, 192, 192, 0.3);
+        border-radius: 10px;
+        color: var(--cynex-silver);
+        padding: 15px;
+        font-size: 1.1rem;
+    }
+
+        .form-control:focus {
+            background: rgba(0, 0, 0, 0.9);
+            border-color: var(--cynex-red);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            color: white;
+        }
+
+    .btn-cynex-primary {
+        background: var(--cynex-red-gradient);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cynex-secondary {
+        background: transparent;
+        border: 2px solid var(--cynex-silver);
+        color: var(--cynex-silver);
+        font-weight: 600;
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+</style>

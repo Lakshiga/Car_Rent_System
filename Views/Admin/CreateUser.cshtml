@@ -1,0 +1,361 @@
+﻿@using Car_Rent_System.Enums
+@model IEnumerable<Car_Rent_System.Models.Booking>
+@{
+    ViewData["Title"] = ViewBag.DashboardTitle;
+}
+
+<div class="container-fluid" style="padding-top: 100px;">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="cynex-font text-cynex-silver display-5">
+                        <i class="fas fa-tachometer-alt text-cynex-red"></i> @ViewBag.DashboardTitle
+                    </h1>
+                    <p class="text-muted">Welcome back, @Context.Session.GetString("FullName")! Manage your CYNEX BLAZER empire.</p>
+                </div>
+                <div>
+                    <a asp-action="AddCar" class="btn btn-cynex-primary">
+                        <i class="fas fa-plus"></i> ADD NEW CAR
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="d-flex align-items-center">
+                    <div class="stats-icon me-3">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div>
+                        <h3 class="stats-number">@ViewBag.TotalCars</h3>
+                        <p class="stats-label">Total Fleet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="d-flex align-items-center">
+                    <div class="stats-icon me-3">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <h3 class="stats-number">@ViewBag.AvailableCars</h3>
+                        <p class="stats-label">Available Cars</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="d-flex align-items-center">
+                    <div class="stats-icon me-3">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="stats-number">@ViewBag.TotalBookings</h3>
+                        <p class="stats-label">Total Bookings</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="d-flex align-items-center">
+                    <div class="stats-icon me-3">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div>
+                        <h3 class="stats-number">$@ViewBag.TotalRevenue</h3>
+                        <p class="stats-label">Total Revenue</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js Analytics -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+            <div class="cynex-card p-4">
+                <h5 class="text-cynex-blue mb-4">Revenue Over Time</h5>
+                <canvas id="revenueChart" height="300"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="cynex-card p-4">
+                <h5 class="text-cynex-blue mb-4">Fleet Status</h5>
+                <canvas id="fleetChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-5">
+        <div class="col-12">
+            <div class="cynex-card p-4">
+                <h5 class="cynex-font text-cynex-silver mb-4">
+                    <i class="fas fa-bolt text-cynex-red"></i> QUICK ACTIONS
+                </h5>
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <a asp-action="AddCar" class="btn btn-outline-primary w-100 py-3">
+                            <i class="fas fa-plus fa-2x mb-2 d-block"></i>
+                            Add New Car
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a asp-action="ManageCars" class="btn btn-outline-success w-100 py-3">
+                            <i class="fas fa-car fa-2x mb-2 d-block"></i>
+                            Manage Fleet
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a asp-action="ViewBookings" class="btn btn-outline-info w-100 py-3">
+                            <i class="fas fa-calendar-alt fa-2x mb-2 d-block"></i>
+                            View Bookings
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a asp-action="ManageUsers" class="btn btn-outline-warning w-100 py-3">
+                            <i class="fas fa-users fa-2x mb-2 d-block"></i>
+                            Manage Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="row">
+        <div class="col-12">
+            <div class="cynex-card">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background: var(--cynex-red); color: white;">
+                    <h5 class="mb-0 cynex-font">
+                        <i class="fas fa-clock"></i> RECENT BOOKINGS
+                    </h5>
+                    <a asp-action="ViewBookings" class="btn btn-sm btn-light">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead style="background: rgba(255, 0, 0, 0.1);">
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Car</th>
+                                        <th>Pickup Date</th>
+                                        <th>Return Date</th>
+                                        <th>Total Cost</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var booking in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-cynex-red rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-cynex-silver">@booking.Customer?.FullName</div>
+                                                        <small class="text-muted">@booking.Customer?.Email</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="@booking.Car?.ImageUrl" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;" alt="Car">
+                                                    <div>
+                                                        <div class="fw-bold text-cynex-silver">@booking.Car?.CarName</div>
+                                                        <small class="text-muted">@booking.Car?.CarModel</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-cynex-silver">@booking.PickupDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="text-cynex-silver">@booking.ReturnDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="fw-bold text-cynex-red">$@booking.TotalCost.ToString("F2")</td>
+                                            <td>
+                                                @switch (booking.BookingStatus)
+                                                {
+                                                    case BookingStatus.Confirmed:
+                                                        <span class="badge bg-success">Confirmed</span>
+                                                        break;
+                                                    case BookingStatus.Cancelled:
+                                                        <span class="badge bg-danger">Cancelled</span>
+                                                        break;
+                                                    default:
+                                                        <span class="badge bg-primary">@booking.BookingStatus.ToString()</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-outline-info" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-warning" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No bookings yet</h5>
+                            <p class="text-muted">Bookings will appear here once customers start making reservations.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Monthly Revenue ($)',
+                        data: [12000, 19000, 15000, 22000, 28000, 35000],
+                        borderColor: '#FF0000',
+                        backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#C0C0C0'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#C0C0C0'
+                            },
+                            grid: {
+                                color: 'rgba(192, 192, 192, 0.2)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#C0C0C0'
+                            },
+                            grid: {
+                                color: 'rgba(192, 192, 192, 0.2)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Fleet Chart
+            const fleetCtx = document.getElementById('fleetChart').getContext('2d');
+            new Chart(fleetCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Available', 'Booked', 'Maintenance'],
+                    datasets: [{
+                        data: [@ViewBag.AvailableCars, @(ViewBag.TotalCars - ViewBag.AvailableCars), 2],
+                        backgroundColor: [
+                            '#00FF00',
+                            '#FF0000',
+                            '#FFA500'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#000000'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#C0C0C0'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .stats-card {
+        background: rgba(0, 0, 0, 0.9);
+        border: 2px solid var(--cynex-red);
+        border-radius: 15px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(255, 0, 0, 0.3);
+        }
+
+    .stats-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--cynex-red-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .stats-number {
+        font-family: 'Orbitron', monospace;
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--cynex-silver);
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-label {
+        color: var(--cynex-silver);
+        font-size: 1rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0;
+    }
+</style>

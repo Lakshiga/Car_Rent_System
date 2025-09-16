@@ -1,0 +1,94 @@
+﻿@model IEnumerable<Car_Rent_System.Models.ApplicationUser>
+@{
+    ViewData["Title"] = "Pending User Approvals";
+}
+
+<div class="container-fluid" style="padding-top: 100px;">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="cynex-font text-cynex-silver display-5 mb-4">
+                <i class="fas fa-user-clock text-cynex-red"></i> PENDING USER APPROVALS
+            </h1>
+            <p class="text-muted mb-5">Review and approve new user registrations</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="cynex-card">
+                <div class="card-header" style="background: var(--cynex-red); color: white;">
+                    <h5 class="mb-0 cynex-font">PENDING USERS</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead style="background: rgba(255, 0, 0, 0.1);">
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Role</th>
+                                        <th>Registration Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var user in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-cynex-red rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-cynex-silver">
+                                                            @user.FirstName @user.LastName
+                                                        </div>
+                                                        <small class="text-muted">@user.UserName</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-cynex-silver">@user.Email</td>
+                                            <td class="text-cynex-silver">@user.PhoneNumber</td>
+                                            <td>
+                                                <span class="badge bg-warning">
+                                                    @user.Role.ToString() <!-- Fixed: Removed any arguments from ToString() -->
+                                                </span>
+                                            </td>
+                                            <td class="text-cynex-silver">@user.JoinDate.ToString("MMM dd, yyyy")</td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <form asp-action="ApproveUser" asp-route-id="@user.Id" method="post" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Approve User">
+                                                            <i class="fas fa-check"></i> Approve
+                                                        </button>
+                                                    </form>
+                                                    <form asp-action="RejectUser" asp-route-id="@user.Id" method="post" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Reject User">
+                                                            <i class="fas fa-times"></i> Reject
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-user-times fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No pending users</h5>
+                            <p class="text-muted">All users have been approved or rejected.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

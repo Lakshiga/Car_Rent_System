@@ -1,0 +1,182 @@
+@using Car_Rent_System.Enums
+@model IEnumerable<Car_Rent_System.ViewModels.Booking.BookingViewModel>
+@{
+    ViewData["Title"] = "Booking Management";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="cynex-font text-cynex-silver">
+                        <i class="fas fa-calendar-check text-cynex-red"></i> Booking Management
+                    </h1>
+                    <p class="text-muted">Manage all customer booking requests and approvals</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="cynex-card">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background: var(--cynex-red); color: white;">
+                    <h5 class="mb-0 cynex-font">
+                        <i class="fas fa-list"></i> All Bookings
+                    </h5>
+                    <span class="badge bg-light text-dark">@Model.Count() Total</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead style="background: rgba(255, 0, 0, 0.1);">
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>NIC Number</th>
+                                        <th>License Number</th>
+                                        <th>License Images</th>
+                                        <th>Pickup Date</th>
+                                        <th>Return Date</th>
+                                        <th>Car Details</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var booking in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-cynex-red rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-cynex-silver">@booking.CustomerName</div>
+                                                        <small class="text-muted">ID: @booking.Id</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-cynex-silver">@booking.NICNumber</td>
+                                            <td class="text-cynex-silver">@booking.LicenseNumber</td>
+                                            <td>
+                                                <div class="d-flex gap-2">
+                                                    @if (!string.IsNullOrEmpty(booking.LicenseImageFrontUrl))
+                                                    {
+                                                        <a href="@booking.LicenseImageFrontUrl" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-image"></i> Front
+                                                        </a>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(booking.LicenseImageBackUrl))
+                                                    {
+                                                        <a href="@booking.LicenseImageBackUrl" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-image"></i> Back
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td class="text-cynex-silver">@booking.PickupDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="text-cynex-silver">@booking.ReturnDate.ToString("MMM dd, yyyy")</td>
+                                            <td>
+                                                <div>
+                                                    <div class="fw-bold text-cynex-silver">@booking.CarName</div>
+                                                    <small class="text-muted">ID: @booking.VehicleId</small>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@(booking.BookingStatus == BookingStatus.Approved ? "success" : booking.BookingStatus == BookingStatus.Rejected ? "danger" : booking.BookingStatus == BookingStatus.Rented ? "info" : "warning")">
+                                                    @booking.BookingStatus
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    @if (booking.BookingStatus == BookingStatus.Pending)
+                                                    {
+                                                        <button class="btn btn-sm btn-success" onclick="updateBookingStatus(@booking.Id, 'Approved')" title="Approve">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger" onclick="updateBookingStatus(@booking.Id, 'Rejected')" title="Reject">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    }
+                                                    @if (booking.BookingStatus == BookingStatus.Approved)
+                                                    {
+                                                        <button class="btn btn-sm btn-primary" onclick="processRent(@booking.Id)" title="Process Rent">
+                                                            <i class="fas fa-handshake"></i> Rent
+                                                        </button>
+                                                    }
+                                                    @if (booking.BookingStatus == BookingStatus.Rented)
+                                                    {
+                                                        <button class="btn btn-sm btn-warning" onclick="processReturn(@booking.Id)" title="Process Return">
+                                                            <i class="fas fa-undo"></i> Return
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No bookings found</h5>
+                            <p class="text-muted">Customer bookings will appear here once they start making reservations.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateBookingStatus(bookingId, status) {
+            if (confirm(`Are you sure you want to ${status.toLowerCase()} this booking?`)) {
+                // AJAX call to update booking status
+                fetch('/Admin/UpdateBookingStatus', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        bookingId: bookingId,
+                        status: status
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error updating booking status: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the booking status.');
+                });
+            }
+        }
+
+        function processRent(bookingId) {
+            // Open rent processing modal
+            $('#rentModal').modal('show');
+            $('#rentModal').data('booking-id', bookingId);
+        }
+
+        function processReturn(bookingId) {
+            // Open return processing modal
+            $('#returnModal').modal('show');
+            $('#returnModal').data('booking-id', bookingId);
+        }
+    </script>
+}

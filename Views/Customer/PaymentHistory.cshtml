@@ -1,0 +1,103 @@
+@using Car_Rent_System.Enums
+@model IEnumerable<Car_Rent_System.ViewModels.Booking.BookingViewModel>
+@{
+    ViewData["Title"] = "Payment History";
+    Layout = "_CustomerLayout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="cynex-font text-cynex-silver">
+                        <i class="fas fa-credit-card text-cynex-red"></i> Payment History
+                    </h1>
+                    <p class="text-muted">View all your payment transactions and billing details</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="cynex-card">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background: var(--cynex-red); color: white;">
+                    <h5 class="mb-0 cynex-font">
+                        <i class="fas fa-list"></i> Payment Transactions
+                    </h5>
+                    <span class="badge bg-light text-dark">@Model.Count() Total</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead style="background: rgba(255, 0, 0, 0.1);">
+                                    <tr>
+                                        <th>Booking ID</th>
+                                        <th>Car Details</th>
+                                        <th>Payment Date</th>
+                                        <th>Amount</th>
+                                        <th>Payment Method</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var booking in Model)
+                                    {
+                                        <tr>
+                                            <td class="text-cynex-silver">#@booking.Id</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="@booking.Car?.ImageUrl" class="rounded me-3" style="width: 40px; height: 40px; object-fit: cover;" alt="Car">
+                                                    <div>
+                                                        <div class="fw-bold text-cynex-silver">@booking.Car?.CarName</div>
+                                                        <small class="text-muted">@booking.Car?.CarModel</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-cynex-silver">@booking.BookingDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="fw-bold text-cynex-red">$@booking.TotalCost.ToString("F2")</td>
+                                            <td class="text-cynex-silver">
+                                                <span class="badge bg-info">Credit Card</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@(booking.BookingStatus == BookingStatus.Completed ? "success" : booking.BookingStatus == BookingStatus.Pending ? "warning" : "info")">
+                                                    @booking.BookingStatus
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary" onclick="viewReceipt(@booking.Id)" title="View Receipt">
+                                                    <i class="fas fa-receipt"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No payment history</h5>
+                            <p class="text-muted">Your payment transactions will appear here.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function viewReceipt(bookingId) {
+            // Open receipt modal or redirect to receipt page
+            alert('Receipt functionality will be implemented here for booking #' + bookingId);
+        }
+    </script>
+}

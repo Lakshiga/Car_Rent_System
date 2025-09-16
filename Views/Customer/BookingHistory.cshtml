@@ -1,0 +1,105 @@
+@using Car_Rent_System.Enums
+@model IEnumerable<Car_Rent_System.ViewModels.Booking.BookingViewModel>
+@{
+    ViewData["Title"] = "My Bookings";
+    Layout = "_CustomerLayout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="cynex-font text-cynex-silver">
+                        <i class="fas fa-calendar-check text-cynex-red"></i> My Bookings
+                    </h1>
+                    <p class="text-muted">View and manage your booking history</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="cynex-card">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background: var(--cynex-red); color: white;">
+                    <h5 class="mb-0 cynex-font">
+                        <i class="fas fa-list"></i> Booking History
+                    </h5>
+                    <span class="badge bg-light text-dark">@Model.Count() Total</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead style="background: rgba(255, 0, 0, 0.1);">
+                                    <tr>
+                                        <th>Car Details</th>
+                                        <th>Pickup Date</th>
+                                        <th>Return Date</th>
+                                        <th>Total Cost</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var booking in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="@booking.Car?.ImageUrl" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;" alt="Car">
+                                                    <div>
+                                                        <div class="fw-bold text-cynex-silver">@booking.Car?.CarName</div>
+                                                        <small class="text-muted">@booking.Car?.CarModel</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-cynex-silver">@booking.PickupDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="text-cynex-silver">@booking.ReturnDate.ToString("MMM dd, yyyy")</td>
+                                            <td class="fw-bold text-cynex-red">$@booking.TotalCost.ToString("F2")</td>
+                                            <td>
+                                                <span class="badge bg-@(booking.BookingStatus == BookingStatus.Approved ? "success" : booking.BookingStatus == BookingStatus.Rejected ? "danger" : booking.BookingStatus == BookingStatus.Rented ? "info" : booking.BookingStatus == BookingStatus.Completed ? "success" : "warning")">
+                                                    @booking.BookingStatus
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if (booking.BookingStatus == BookingStatus.Pending)
+                                                {
+                                                    <form asp-action="CancelBooking" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                                                        <input type="hidden" name="id" value="@booking.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-danger" title="Cancel Booking">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-sm btn-outline-info" title="View Details" disabled>
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No bookings found</h5>
+                            <p class="text-muted">Your booking history will appear here once you make reservations.</p>
+                            <a asp-action="BrowseCars" class="btn btn-cynex-primary">
+                                <i class="fas fa-car"></i> Browse Cars
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
